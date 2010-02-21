@@ -35,16 +35,19 @@ import time
 import ConfigParser
 import pygame.mixer as mixer
 
+import pygtk
+pygtk.require('2.0')
+import gtk
+
+import pynotify
+pynotify.init("Basics")
+
 config = ConfigParser.ConfigParser()
 config.read('pyrana.cfg')
 
 def notify(songpath):
     to_display = "Playing: %s" % songpath
     if config.get('main', 'notification_type') == 'pynotify':
-        import pygtk
-        pygtk.require('2.0')
-        import pynotify
-        pynotify.init("Basics")
         n = pynotify.Notification("Pyrana", to_display)
         n.show()
     else:
