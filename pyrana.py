@@ -45,13 +45,7 @@ pynotify.init("Basics")
 config = ConfigParser.ConfigParser()
 config.read('pyrana.cfg')
 
-def notify(songpath):
-    to_display = "Playing: %s" % songpath
-    if config.get('main', 'notification_type') == 'pynotify':
-        n = pynotify.Notification("Pyrana", to_display)
-        n.show()
-    else:
-        pass
+
 
 
 
@@ -114,7 +108,7 @@ class Pyrana(object):
                 if not mixer.music.get_busy():
                     songpath = album[0]
                     album = album[1:]
-                    notify(songpath)
+                    self._notify(songpath)
                     self.statusIcon.set_tooltip("Playing: %s" % songpath)
                     mixer.music.load(songpath)
                     mixer.music.play()
@@ -127,7 +121,15 @@ class Pyrana(object):
 
 
             self.artists = filter(None, self.artists)
-        
+
+    def _notify(self, songpath):
+        to_display = "Playing: %s" % songpath
+        if config.get('main', 'notification_type') == 'pynotify':
+            n = pynotify.Notification("Pyrana", to_display)
+            n.show()
+        else:
+            pass
+    
 if __name__ == '__main__':
     import sys
     player = Pyrana(sys.argv[1])
