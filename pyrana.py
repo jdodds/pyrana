@@ -88,11 +88,10 @@ class Pyrana(object):
             mixer.init(self.frequency)
             self.statusIcon.set_from_file('playing.png')
             self._play()
-
-
         else:
             mixer.quit()
             self.statusIcon.set_from_file('stopped.png')
+            self.statusIcon.set_tooltip("Not Playing")
 
     def _play(self):
         while self.artists:
