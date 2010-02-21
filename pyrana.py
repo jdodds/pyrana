@@ -55,7 +55,6 @@ def notify(songpath):
 
 
 def play(root, frequency=44100):
-    mixer.init(frequency)
     #give us a list of sets of albums by artists, assuming the directory structure
     #Artists
     # Albums
@@ -83,6 +82,8 @@ def play(root, frequency=44100):
                         for song in os.listdir(albumpath)
                         if song.endswith('mp3')])
         while album:
+            if not mixer.get_init():
+                break
             if not mixer.music.get_busy():
                 songpath = album[0]
                 album = album[1:]
@@ -92,9 +93,38 @@ def play(root, frequency=44100):
             else:
                 #avoid eating cpu
                 time.sleep(1)
+                #allow this shit to flush...
+                while gtk.events_pending():
+                    gtk.main_iteration(False)
+
 
         artists = filter(None, artists)
 
+
+class Pyrana(object):
+    def __init__(self, root, frequency=44100):
+        self.frequency = frequency
+        self.statusIcon = gtk.StatusIcon()
+        self.statusIcon.connect('activate', self.activate)
+        self.root = root
+        self.statusIcon.set_visible(True)
+        self.statusIcon.set_tooltip("Pyrana, buddy")
+        self.statusIcon.set_from_file('stopped.png')
+        gtk.main()
+        
+    def activate(self, widget, data=None):
+        if not mixer.get_init():
+            mixer.init(self.frequency)
+            self.statusIcon.set_from_file('playing.png')
+            play(self.root)
+
+        else:
+            mixer.quit()
+            self.statusIcon.set_from_file('stopped.png')
+
+
+        
 if __name__ == '__main__':
     import sys
-    play(sys.argv[1])
+    player = Pyrana(sys.argv[1])
+
