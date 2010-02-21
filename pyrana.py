@@ -54,53 +54,6 @@ def notify(songpath):
         print to_display
 
 
-def play(root, frequency=44100):
-    #give us a list of sets of albums by artists, assuming the directory structure
-    #Artists
-    # Albums
-    #  Songs
-    #This is a little ugly, but whatever. 
-    artists = [set([os.path.join(artist, album)
-                   for album in os.listdir(artist)
-                   if os.path.isdir(os.path.join(artist, album))])
-              for artist in [os.path.join(root, artistname)
-                             for artistname in os.listdir(root)
-                             if os.path.isdir(os.path.join(root, artistname))]]
-
-    #just in case we get some empty directories
-    artists = filter(None, artists)
-
-    while artists:
-        if not mixer.get_init():
-            break
-        artist = random.choice(artists)
-
-        #this ensures that we never play the same album twice
-        albumpath = artist.pop()
-
-        #hopefully, the tracks will be named in such a way that we can rely
-        #on their names for ordering 
-        album = sorted([os.path.join(albumpath, song)
-                        for song in os.listdir(albumpath)
-                        if song.endswith('mp3')])
-        while album:
-            if not mixer.get_init():
-                break
-            if not mixer.music.get_busy():
-                songpath = album[0]
-                album = album[1:]
-                notify(songpath)
-                mixer.music.load(songpath)
-                mixer.music.play()
-            else:
-                #avoid eating cpu
-                time.sleep(1)
-                #allow this shit to flush...
-                while gtk.events_pending():
-                    gtk.main_iteration(False)
-
-
-        artists = filter(None, artists)
 
 
 class Pyrana(object):
@@ -112,19 +65,68 @@ class Pyrana(object):
         self.statusIcon.set_visible(True)
         self.statusIcon.set_tooltip("Pyrana!")
         self.statusIcon.set_from_file('stopped.png')
+
+        #give us a list of sets of albums by artists, assuming the directory structure
+        #Artists
+        # Albums
+        #  Songs
+        #This is a little ugly, but whatever. 
+        self.artists = [set([os.path.join(artist, album)
+                             for album in os.listdir(artist)
+                             if os.path.isdir(os.path.join(artist, album))])
+                        for artist in [os.path.join(root, artistname)
+                                       for artistname in os.listdir(root)
+                                       if os.path.isdir(os.path.join(root, artistname))]]
+
+        #just in case we get some empty directories
+        self.artists = filter(None, self.artists)
+
         gtk.main()
         
     def activate(self, widget, data=None):
         if not mixer.get_init():
             mixer.init(self.frequency)
             self.statusIcon.set_from_file('playing.png')
-            play(self.root)
+            self._play()
+
 
         else:
             mixer.quit()
             self.statusIcon.set_from_file('stopped.png')
 
+    def _play(self):
+        while self.artists:
+            if not mixer.get_init():
+                break
+            artist = random.choice(self.artists)
 
+            #this ensures that we never play the same album twice
+            albumpath = artist.pop()
+
+            #hopefully, the tracks will be named in such a way that we can rely
+            #on their names for ordering 
+            album = sorted([os.path.join(albumpath, song)
+                            for song in os.listdir(albumpath)
+                            if song.endswith('mp3')])
+            while album:
+                if not mixer.get_init():
+                    break
+                if not mixer.music.get_busy():
+                    songpath = album[0]
+                    album = album[1:]
+                    notify(songpath)
+                    self.statusIcon.set_tooltip("Playing: %s" % songpath)
+                    mixer.music.load(songpath)
+                    mixer.music.play()
+                else:
+                    #avoid eating cpu
+                    time.sleep(1)
+                    #allow this shit to flush...
+                    while gtk.events_pending():
+                        gtk.main_iteration(False)
+
+
+            self.artists = filter(None, self.artists)
         
 if __name__ == '__main__':
     import sys
