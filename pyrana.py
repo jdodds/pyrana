@@ -42,8 +42,6 @@ import gtk
 import pynotify
 pynotify.init("Basics")
 
-
-
 class Pyrana(object):
     def __init__(self, root, frequency=44100):
         self.frequency = frequency
