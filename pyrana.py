@@ -110,7 +110,7 @@ class Pyrana(object):
         self.statusIcon.connect('activate', self.activate)
         self.root = root
         self.statusIcon.set_visible(True)
-        self.statusIcon.set_tooltip("Pyrana, buddy")
+        self.statusIcon.set_tooltip("Pyrana!")
         self.statusIcon.set_from_file('stopped.png')
         gtk.main()
         
