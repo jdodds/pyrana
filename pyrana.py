@@ -71,6 +71,8 @@ def play(root, frequency=44100):
     artists = filter(None, artists)
 
     while artists:
+        if not mixer.get_init():
+            break
         artist = random.choice(artists)
 
         #this ensures that we never play the same album twice
