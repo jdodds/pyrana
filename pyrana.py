@@ -45,12 +45,6 @@ pynotify.init("Basics")
 config = ConfigParser.ConfigParser()
 config.read('pyrana.cfg')
 
-
-
-
-
-
-
 class Pyrana(object):
     def __init__(self, root, frequency=44100):
         self.frequency = frequency
