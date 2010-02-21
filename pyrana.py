@@ -26,8 +26,9 @@ collection is so large that the probability of me fixing the metadata ever is
 basically nil. I can, however, rely on the directory structure of my music
 collection.
 
-This little ~50 line does one thing, and does it acceptably -- play random
-albums from a music collection. Maybe it'll expand in the future. I doubt it.
+This little program does one thing, and does it acceptably -- play random
+albums from a music collection. Maybe it'll expand in the future to include
+things like last.fm support. Maybe.
 """
 import os
 import random
