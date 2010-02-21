@@ -1,9 +1,9 @@
 Pyrana -- a minimalist music player.
 
-This little script was written out of frustration with larger music
-players. Pretty much all I've ever wanted out of a music player was one that
-played random albums by picking a random artist, then picking a random album,
-then playing that album, then picking _another random artist_.
+This program was written out of frustration with larger music players. Pretty
+much all I've ever wanted out of a music player was one that played random
+albums by picking a random artist, then picking a random album, then playing
+that album, then picking _another random artist_.
 
 For some reason,I've never run into a music player that played random albums
 that way, which led to me often ending up having to skip past multiple Frank
@@ -12,20 +12,22 @@ much. Same deal with Slayer and Aphex Twin and Bad Religion, and all these other
 artists and bands that I have discographies of.
 
 Another problem I've had is that a lot of 'modern' music players base their
-artist and album information off of metadata. I have a couple of issues with this:
+artist and album information off of metadata. I have a couple of issues with
+this:
 
 1: My music collection is large. Doing a scan of metadata, even if it only needs
 to be done once takes a long time. I hate it.
 
 2: My music collection has unreliable metadata. This is because I'm a lazy
 asshole, and haven't kept up with fixing metadata on music that I
-download. That's right, I download music -- so do you, shut up. Since my music
+download. That's right, I download music -- so do you, shut up. My music
 collection is so large that the probability of me fixing the metadata ever is
 basically nil. I can, however, rely on the directory structure of my music
 collection.
 
-This little program does one thing, and does it acceptably -- play random
-albums from a music collection. Maybe it'll expand in the future to include
-things like last.fm support. Maybe.
+This little program does one thing, and does it acceptably -- play random albums
+from a music collection. Maybe it'll expand in the future to include things like
+last.fm support. Maybe.
 
-Questions? Comments? Suggestions? Hate-mail? Hit me up at jeremiah.dodds@gmail.com
+Questions? Comments? Suggestions? Hate-mail? Hit me up at
+jeremiah.dodds@gmail.com
