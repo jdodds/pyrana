@@ -42,8 +42,7 @@ import gtk
 import pynotify
 pynotify.init("Basics")
 
-config = ConfigParser.ConfigParser()
-config.read('pyrana.cfg')
+
 
 class Pyrana(object):
     def __init__(self, root, frequency=44100):
@@ -54,6 +53,9 @@ class Pyrana(object):
         self.statusIcon.set_visible(True)
         self.statusIcon.set_tooltip("Pyrana!")
         self.statusIcon.set_from_file('stopped.png')
+
+        self.config = ConfigParser.ConfigParser()
+        self.config.read('pyrana.cfg')
 
         #give us a list of sets of albums by artists, assuming the directory structure
         #Artists
@@ -118,7 +120,7 @@ class Pyrana(object):
 
     def _notify(self, songpath):
         to_display = "Playing: %s" % songpath
-        if config.get('main', 'notification_type') == 'pynotify':
+        if self.config.get('main', 'notification_type') == 'pynotify':
             n = pynotify.Notification("Pyrana", to_display)
             n.show()
         else:
