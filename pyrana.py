@@ -51,7 +51,8 @@ def notify(songpath):
         n = pynotify.Notification("Pyrana", to_display)
         n.show()
     else:
-        print to_display
+        pass
+
 
 
 
