@@ -62,9 +62,9 @@ class Pyrana(object):
         # Albums
         #  Songs
         #This is a little ugly, but whatever. 
-        self.artists = [set([os.path.join(artist, album)
+        self.artists = [[os.path.join(artist, album)
                              for album in os.listdir(artist)
-                             if os.path.isdir(os.path.join(artist, album))])
+                             if os.path.isdir(os.path.join(artist, album))]
                         for artist in [os.path.join(root, artistname)
                                        for artistname in os.listdir(root)
                                        if os.path.isdir(os.path.join(root, artistname))]]
@@ -91,7 +91,7 @@ class Pyrana(object):
             artist = random.choice(self.artists)
 
             #this ensures that we never play the same album twice
-            albumpath = artist.pop()
+            albumpath = artist.pop(random.randrange(len(artist)))
 
             #hopefully, the tracks will be named in such a way that we can rely
             #on their names for ordering 
