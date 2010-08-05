@@ -10,15 +10,15 @@ that album, then picking _another random artist_.
 For some reason,I've never run into a music player that played random albums
 that way, which led to me often ending up having to skip past multiple Frank
 Zappa albums when playing random albums. I like Zappa, but not that goddamned
-much. Same deal with Slayer and Aphex Twin and Bad Religion, and all these other
-artists and bands that I have discographies of.
+much. Same deal with Slayer and Aphex Twin and Bad Religion, and all these
+other artists and bands that I have discographies of.
 
 Another problem I've had is that a lot of 'modern' music players base their
 artist and album information off of metadata. I have a couple of issues with
 this:
 
-1: My music collection is large. Doing a scan of metadata, even if it only needs
-to be done once takes a long time. I hate it.
+1: My music collection is large. Doing a scan of metadata, even if it only
+needs to be done once takes a long time. I hate it.
 
 2: My music collection has unreliable metadata. This is because I'm a lazy
 asshole, and haven't kept up with fixing metadata on music that I
@@ -27,10 +27,12 @@ collection is so large that the probability of me fixing the metadata ever is
 basically nil. I can, however, rely on the directory structure of my music
 collection.
 
-This little program does one thing, and does it acceptably -- play random albums
-from a music collection. Maybe it'll expand in the future to include things like
-last.fm support. Maybe.
+This little program does one thing, and does it acceptably -- play random
+albums from a music collection. Maybe it'll expand in the future to include
+things like last.fm support. Maybe.
 """
+
+
 import os
 import random
 import time
@@ -44,9 +46,11 @@ import gtk
 import pynotify
 pynotify.init("Basics")
 
+
 class Pyrana(object):
     """Our player, sending sweet, sweet sounds to our speakers.
     """
+
     def __init__(self, root, frequency=44100):
         """Initialize our player with a root directory to search through for
         music, and start the gtk main thread.
@@ -78,7 +82,6 @@ class Pyrana(object):
 
         #just in case we get some empty directories
         self.artists = [a for a in self.artists if a]
-
 
         gtk.main()
 
@@ -127,7 +130,6 @@ class Pyrana(object):
                     #allow this shit to flush...
                     while gtk.events_pending():
                         gtk.main_iteration(False)
-
 
             self.artists = [a for a in self.artists if a]
 
