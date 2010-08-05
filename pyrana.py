@@ -45,46 +45,59 @@ import pynotify
 pynotify.init("Basics")
 
 class Pyrana(object):
+    """Our player, sending sweet, sweet sounds to our speakers.
+    """
     def __init__(self, root, frequency=44100):
+        """Initialize our player with a root directory to search through for
+        music, and start the gtk main thread.
+        """
         self.frequency = frequency
-        self.statusIcon = gtk.StatusIcon()
-        self.statusIcon.connect('activate', self.activate)
+        self.status_icon = gtk.StatusIcon()
+        self.status_icon.connect('activate', self.activate)
         self.root = root
-        self.statusIcon.set_visible(True)
-        self.statusIcon.set_tooltip("Pyrana!")
-        self.statusIcon.set_from_file('stopped.png')
+        self.status_icon.set_visible(True)
+        self.status_icon.set_tooltip("Pyrana!")
+        self.status_icon.set_from_file('stopped.png')
 
         self.config = ConfigParser.ConfigParser()
         self.config.read('pyrana.cfg')
 
-        #give us a list of sets of albums by artists, assuming the directory structure
+        #give us a list of sets of albums by artists, assuming the directory
+        #structure
         #Artists
         # Albums
         #  Songs
-        #This is a little ugly, but whatever. 
+        #This is a little ugly, but whatever.
         self.artists = [[os.path.join(artist, album)
                              for album in os.listdir(artist)
                              if os.path.isdir(os.path.join(artist, album))]
-                        for artist in [os.path.join(root, artistname)
-                                       for artistname in os.listdir(root)
-                                       if os.path.isdir(os.path.join(root, artistname))]]
+                        for artist in
+                        [os.path.join(root, artistname)
+                         for artistname in os.listdir(root)
+                         if os.path.isdir(os.path.join(root, artistname))]]
 
         #just in case we get some empty directories
-        self.artists = filter(None, self.artists)
+        self.artists = [a for a in self.artists if a]
+
 
         gtk.main()
-        
+
     def activate(self, widget, data=None):
+        """Click handler for our status icon. Play or stop playing,
+        respectively.
+        """
         if not mixer.get_init():
             mixer.init(self.frequency)
-            self.statusIcon.set_from_file('playing.png')
+            self.status_icon.set_from_file('playing.png')
             self._play()
         else:
             mixer.quit()
-            self.statusIcon.set_from_file('stopped.png')
-            self.statusIcon.set_tooltip("Not Playing")
+            self.status_icon.set_from_file('stopped.png')
+            self.status_icon.set_tooltip("Not Playing")
 
     def _play(self):
+        """Send mp3 files through pygame to actually play them.
+        """
         while self.artists:
             if not mixer.get_init():
                 break
@@ -94,7 +107,7 @@ class Pyrana(object):
             albumpath = artist.pop(random.randrange(len(artist)))
 
             #hopefully, the tracks will be named in such a way that we can rely
-            #on their names for ordering 
+            #on their names for ordering
             album = sorted([os.path.join(albumpath, song)
                             for song in os.listdir(albumpath)
                             if song.endswith('mp3')])
@@ -105,7 +118,7 @@ class Pyrana(object):
                     songpath = album[0]
                     album = album[1:]
                     self._notify(songpath)
-                    self.statusIcon.set_tooltip("Playing: %s" % songpath)
+                    self.status_icon.set_tooltip("Playing: %s" % songpath)
                     mixer.music.load(songpath)
                     mixer.music.play()
                 else:
@@ -116,17 +129,18 @@ class Pyrana(object):
                         gtk.main_iteration(False)
 
 
-            self.artists = filter(None, self.artists)
+            self.artists = [a for a in self.artists if a]
 
     def _notify(self, songpath):
+        """Use libnotify to show growl-like alerts about what's playing.
+        """
         to_display = "Playing: %s" % songpath
         if self.config.get('main', 'notification_type') == 'pynotify':
-            n = pynotify.Notification("Pyrana", to_display)
-            n.show()
+            notification = pynotify.Notification("Pyrana", to_display)
+            notification.show()
         else:
             pass
-    
+
 if __name__ == '__main__':
     import sys
-    player = Pyrana(sys.argv[1])
-
+    Pyrana(sys.argv[1])
