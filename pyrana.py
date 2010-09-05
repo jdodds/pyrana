@@ -53,7 +53,7 @@ class Pyrana(object):
     """Our player, sending sweet, sweet sounds to our speakers.
     """
 
-    def __init__(self, root):
+    def __init__(self):
         """Initialize our player with a root directory to search through for
         music, and start the gtk main thread.
         """
@@ -61,22 +61,21 @@ class Pyrana(object):
 
         self.status_icon = gtk.StatusIcon()
         self.status_icon.connect('activate', self.activate)
-
-        self.root = root
-
         self.status_icon.set_visible(True)
         self.status_icon.set_tooltip("Pyrana!")
         self.status_icon.set_from_file(os.path.join(self.base_path,'stopped.png'))
 
         self.config = ConfigParser.ConfigParser()
         self.config.read(os.path.join(self.base_path, 'pyrana.cfg'))
-
+        
         #give us a list of sets of albums by artists, assuming the directory
         #structure
         #Artists
         # Albums
         #  Songs
         #This is a little ugly, but whatever.
+        root = os.path.expanduser(
+            self.config.get('main', 'music_dir'))
         self.artists = [[os.path.join(artist, album)
                              for album in os.listdir(artist)
                              if os.path.isdir(os.path.join(artist, album))]
@@ -156,4 +155,4 @@ class Pyrana(object):
 
 if __name__ == '__main__':
     import sys
-    Pyrana(sys.argv[1])
+    Pyrana()
