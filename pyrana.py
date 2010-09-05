@@ -35,9 +35,11 @@ things like last.fm support. Maybe.
 
 import os
 import random
-import time
 import ConfigParser
-import pygame.mixer as mixer
+
+import pygst
+pygst.require("0.10")
+import gst
 
 import pygtk
 pygtk.require('2.0')
@@ -51,20 +53,23 @@ class Pyrana(object):
     """Our player, sending sweet, sweet sounds to our speakers.
     """
 
-    def __init__(self, root, frequency=44100):
+    def __init__(self, root):
         """Initialize our player with a root directory to search through for
         music, and start the gtk main thread.
         """
-        self.frequency = frequency
+        self.base_path = os.path.dirname(os.path.realpath(__file__))
+
         self.status_icon = gtk.StatusIcon()
         self.status_icon.connect('activate', self.activate)
+
         self.root = root
+
         self.status_icon.set_visible(True)
         self.status_icon.set_tooltip("Pyrana!")
-        self.status_icon.set_from_file('stopped.png')
+        self.status_icon.set_from_file(os.path.join(self.base_path,'stopped.png'))
 
         self.config = ConfigParser.ConfigParser()
-        self.config.read('pyrana.cfg')
+        self.config.read(os.path.join(self.base_path, 'pyrana.cfg'))
 
         #give us a list of sets of albums by artists, assuming the directory
         #structure
@@ -83,55 +88,61 @@ class Pyrana(object):
         #just in case we get some empty directories
         self.artists = [a for a in self.artists if a]
 
+        self.player = gst.element_factory_make("playbin2", "player")
+
+        bus = self.player.get_bus()
+        bus.add_signal_watch()
+        bus.enable_sync_message_emission()
+        bus.connect('message::eos', self.on_eos)
+
+        self.playing = False
+        self.cur_song = None
+        self.cur_album = None
+        self.cur_artist = None
+        
         gtk.main()
 
+    def on_eos(self, bus, msg):
+        self.player.set_state(gst.STATE_NULL)
+        self.cur_song = None
+        self.playing = False
+        self.activate(None)
+        
     def activate(self, widget, data=None):
         """Click handler for our status icon. Play or stop playing,
         respectively.
         """
-        if not mixer.get_init():
-            mixer.init(self.frequency)
-            self.status_icon.set_from_file('playing.png')
-            self._play()
+        if not self.playing:
+            self.playing = True
+            self.status_icon.set_from_file(
+                os.path.join(self.base_path, 'playing.png'))
+            if not self.cur_song:
+                self.cur_song = self.get_next_song()
+                self.player.set_property('uri', 'file://%s' % self.cur_song)
+            self.player.set_state(gst.STATE_PLAYING)
+            self.status_icon.set_tooltip(self.cur_song)
+            self._notify(self.cur_song)
+            
         else:
-            mixer.quit()
-            self.status_icon.set_from_file('stopped.png')
+            self.player.set_state(gst.STATE_PAUSED)
+            self.playing = False
+            self.status_icon.set_from_file(os.path.join(
+                    self.base_path, 'stopped.png'))
             self.status_icon.set_tooltip("Not Playing")
 
-    def _play(self):
-        """Send mp3 files through pygame to actually play them.
-        """
-        while self.artists:
-            if not mixer.get_init():
-                break
-            artist = random.choice(self.artists)
-
-            #this ensures that we never play the same album twice
+    def get_next_song(self):
+        if not self.cur_album:
+            artist = self.cur_artist
+            
+            while artist == self.cur_artist:
+                artist = random.choice(self.artists)
+                
             albumpath = artist.pop(random.randrange(len(artist)))
-
-            #hopefully, the tracks will be named in such a way that we can rely
-            #on their names for ordering
-            album = sorted([os.path.join(albumpath, song)
-                            for song in os.listdir(albumpath)
-                            if song.endswith('mp3')])
-            while album:
-                if not mixer.get_init():
-                    break
-                if not mixer.music.get_busy():
-                    songpath = album[0]
-                    album = album[1:]
-                    self._notify(songpath)
-                    self.status_icon.set_tooltip("Playing: %s" % songpath)
-                    mixer.music.load(songpath)
-                    mixer.music.play()
-                else:
-                    #avoid eating cpu
-                    time.sleep(1)
-                    #allow this shit to flush...
-                    while gtk.events_pending():
-                        gtk.main_iteration(False)
-
-            self.artists = [a for a in self.artists if a]
+            self.cur_album = sorted([os.path.join(albumpath, song)
+                                     for song in os.listdir(albumpath)])
+        song = self.cur_album[0]
+        self.cur_album = self.cur_album[1:]
+        return song
 
     def _notify(self, songpath):
         """Use libnotify to show growl-like alerts about what's playing.
