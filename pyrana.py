@@ -152,6 +152,8 @@ class Pyrana(object):
             self.status_icon.set_from_file(os.path.join(
                     self.base_path, 'stopped.png'))
             self.status_icon.set_tooltip("[PAUSED] %s" % self.cur_song)
+            if self.pidgin_status:
+                self.update_pidgin_status()
             
     def on_right_click(self, data, event_button, event_time):
         self.menu.popup(None, None, None, event_button, event_time)
@@ -187,14 +189,18 @@ class Pyrana(object):
         notification = pynotify.Notification("Pyrana", to_display)
         notification.show()
     
-    def update_pidgin_status(self, songpath):
+    def update_pidgin_status(self, songpath=None):
         import dbus
         bus = dbus.SessionBus()
-        parts = songpath.split('/')
 
-        artist = parts[-3]
-        album = parts[-2]
-        song = parts[-1]
+        if songpath:
+            parts = songpath.split('/')
+            artist = parts[-3]
+            album = parts[-2]
+            song = parts[-1]
+            message = "%s (%s): %s" % (artist, album, song)
+        else:
+            message = "Paused"
         
         if "im.pidgin.purple.PurpleService" in bus.list_names():
             purple = bus.get_object("im.pidgin.purple.PurpleService",
@@ -203,9 +209,8 @@ class Pyrana(object):
             current = purple.PurpleSavedstatusGetType(
                 purple.PurpleSavedstatusGetCurrent())
             status = purple.PurpleSavedstatusNew("", current)
-            purple.PurpleSavedstatusSetMessage(status,
-                                               "%s (%s): %s" %
-                                               (artist, album, song))
+            purple.PurpleSavedstatusSetMessage(status, message)
+
             purple.PurpleSavedstatusActivate(status)
 
 if __name__ == '__main__':
