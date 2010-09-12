@@ -169,7 +169,6 @@ class Pyrana(object):
     def skip_album(self, data=None):
         self.cur_album = None
         self.on_eos(None, None)
-        pass
 
     def quit(widget, data=None):
         gtk.main_quit()
