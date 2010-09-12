@@ -60,11 +60,28 @@ class Pyrana(object):
         self.base_path = os.path.dirname(os.path.realpath(__file__))
 
         self.status_icon = gtk.StatusIcon()
-        self.status_icon.connect('activate', self.activate)
+        self.status_icon.connect('activate', self.on_left_click)
+        self.status_icon.connect('popup-menu', self.on_right_click)
         self.status_icon.set_visible(True)
         self.status_icon.set_tooltip("Pyrana!")
         self.status_icon.set_from_file(os.path.join(self.base_path,'stopped.png'))
+        
+        self.menu = gtk.Menu()
+        skip_song = gtk.MenuItem("Skip Song")
+        skip_album = gtk.MenuItem("Skip Album")
+        quit_app = gtk.MenuItem("Quit")
+        self.menu.append(skip_song)
+        self.menu.append(skip_album)
+        self.menu.append(quit_app)
 
+        skip_song.connect_object("activate", self.skip_song, "Skip Song")
+        skip_album.connect_object("activate", self.skip_album, "Skip Album")
+        quit_app.connect_object("activate", self.quit, "Quit")
+        
+        skip_song.show()
+        skip_album.show()
+        quit_app.show()
+        
         self.config = ConfigParser.ConfigParser()
         self.config.read(os.path.join(self.base_path, 'pyrana.cfg'))
         
@@ -105,9 +122,9 @@ class Pyrana(object):
         self.player.set_state(gst.STATE_NULL)
         self.cur_song = None
         self.playing = False
-        self.activate(None)
+        self.on_left_click(None)
         
-    def activate(self, widget, data=None):
+    def on_left_click(self, widget, data=None):
         """Click handler for our status icon. Play or stop playing,
         respectively.
         """
@@ -128,6 +145,9 @@ class Pyrana(object):
             self.status_icon.set_from_file(os.path.join(
                     self.base_path, 'stopped.png'))
             self.status_icon.set_tooltip("[PAUSED] %s" % self.cur_song)
+            
+    def on_right_click(self, data, event_button, event_time):
+        self.menu.popup(None, None, None, event_button, event_time)
 
     def get_next_song(self):
         if not self.cur_album:
@@ -142,6 +162,18 @@ class Pyrana(object):
         song = self.cur_album[0]
         self.cur_album = self.cur_album[1:]
         return song
+
+    def skip_song(self, data=None):
+        self.on_eos(None, None)
+
+    def skip_album(self, data=None):
+        self.cur_album = None
+        self.on_eos(None, None)
+        pass
+
+    def quit(widget, data=None):
+        gtk.main_quit()
+        
 
     def _notify(self, songpath):
         """Use libnotify to show growl-like alerts about what's playing.
