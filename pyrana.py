@@ -127,7 +127,7 @@ class Pyrana(object):
             self.playing = False
             self.status_icon.set_from_file(os.path.join(
                     self.base_path, 'stopped.png'))
-            self.status_icon.set_tooltip("Not Playing")
+            self.status_icon.set_tooltip("[PAUSED] %s" % self.cur_song)
 
     def get_next_song(self):
         if not self.cur_album:
