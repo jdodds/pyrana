@@ -84,6 +84,10 @@ class Pyrana(object):
         
         self.config = ConfigParser.ConfigParser()
         self.config.read(os.path.join(self.base_path, 'pyrana.cfg'))
+
+        self.pidgin_status = self.config.get('main',
+                                             'update_pidgin_status')
+        self.use_notify = self.config.get('main', 'use_notify')
         
         #give us a list of sets of albums by artists, assuming the directory
         #structure
@@ -137,7 +141,10 @@ class Pyrana(object):
                 self.player.set_property('uri', 'file://%s' % self.cur_song)
             self.player.set_state(gst.STATE_PLAYING)
             self.status_icon.set_tooltip(self.cur_song)
-            self._notify(self.cur_song)
+            if self.use_notify:
+                self.notify(self.cur_song)
+            if self.pidgin_status:
+                self.update_pidgin_status(self.cur_song)
             
         else:
             self.player.set_state(gst.STATE_PAUSED)
@@ -172,17 +179,34 @@ class Pyrana(object):
 
     def quit(widget, data=None):
         gtk.main_quit()
-        
 
-    def _notify(self, songpath):
+    def notify(self, songpath):
         """Use libnotify to show growl-like alerts about what's playing.
         """
         to_display = "Playing: %s" % songpath
-        if self.config.get('main', 'notification_type') == 'pynotify':
-            notification = pynotify.Notification("Pyrana", to_display)
-            notification.show()
-        else:
-            pass
+        notification = pynotify.Notification("Pyrana", to_display)
+        notification.show()
+    
+    def update_pidgin_status(self, songpath):
+        import dbus
+        bus = dbus.SessionBus()
+        parts = songpath.split('/')
+
+        artist = parts[-3]
+        album = parts[-2]
+        song = parts[-1]
+        
+        if "im.pidgin.purple.PurpleService" in bus.list_names():
+            purple = bus.get_object("im.pidgin.purple.PurpleService",
+                                    "/im/pidgin/purple/PurpleObject",
+                                    "im.pidgin.purple.PurpleInterface")
+            current = purple.PurpleSavedstatusGetType(
+                purple.PurpleSavedstatusGetCurrent())
+            status = purple.PurpleSavedstatusNew("", current)
+            purple.PurpleSavedstatusSetMessage(status,
+                                               "%s (%s): %s" %
+                                               (artist, album, song))
+            purple.PurpleSavedstatusActivate(status)
 
 if __name__ == '__main__':
     import sys
