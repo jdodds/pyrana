@@ -53,6 +53,12 @@ class Pyrana(object):
     """Our player, sending sweet, sweet sounds to our speakers.
     """
 
+    audio_types = [
+        '.mp3',
+        '.m4a',
+        '.ogg'
+    ]
+
     def __init__(self):
         """Initialize our player with a root directory to search through for
         music, and start the gtk main thread.
@@ -159,6 +165,7 @@ class Pyrana(object):
         self.menu.popup(None, None, None, event_button, event_time)
 
     def get_next_song(self):
+        import os.path
         if not self.cur_album:
             artist = self.cur_artist
             
@@ -166,8 +173,11 @@ class Pyrana(object):
                 artist = random.choice(self.artists)
                 
             albumpath = artist.pop(random.randrange(len(artist)))
-            self.cur_album = sorted([os.path.join(albumpath, song)
-                                     for song in os.listdir(albumpath)])
+            self.cur_album = sorted(
+                [os.path.join(albumpath, song)
+                 for song in os.listdir(albumpath)
+                 if os.path.splitext(song)[-1] in self.audio_types])
+
         song = self.cur_album[0]
         self.cur_album = self.cur_album[1:]
         return song
