@@ -45,10 +45,19 @@ music/
   Robby and the Revoltors/
     William S. Burroughs Was My Father/
 
-For the moment, Pyrana assumes your music is in a directory called ~/music . If
-it isn't, ln it there if you want Pyrana to work. This will, with any luck, be
-changing shortly.
+CONFIGURING
+-----------
 
+Pyrana stores its configuration in ~/.pyrana/pyrana.cfg. It currently accepts 3
+options:
+
+use_notify :: whether or not to use libnotify to pop up little messages about
+what's playing, defaults to True
+
+music_dir :: where your music is located, defaults to ~/music
+
+update_pidgin_status :: whether you want Pyrana to update your pidgin status for
+you when a track updates, defaults to True
 
 CREDIT
 ------
