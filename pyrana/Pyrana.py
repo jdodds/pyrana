@@ -1,4 +1,4 @@
-#!/Usr/bin/env python
+#!/usr/bin/env python
 """
 Pyrana -- a minimalist music player.
 
