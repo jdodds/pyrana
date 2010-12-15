@@ -11,7 +11,7 @@ that album, then picking another random artist.
 
 For some reason,I've never run into a music player that played random albums
 that way, which led to me often ending up having to skip past multiple albums by
-a particular artist, especially when the artist has a large discography. 
+a particular artist, especially when the artist has a large discography.
 
 While I call this player minimalist, that's not set in stone -- I'll probably
 add last.fm scrobbling capability and other various features. These features
@@ -36,6 +36,18 @@ probably try to move away from this dependency in the near future.
 ALSO, you'll need to install gst-python >= 0.10.0, available from
 http://gstreamer.freedesktop.org/src/gst-python/ . This is another dependency
 I'll be most likely removing at some point...
+
+Your music directory has to be arranged in a artist/album heirarchy. Something like:
+
+music/
+  Underpowered Umpires/
+    Third Strike/
+  Robby and the Revoltors/
+    William S. Burroughs Was My Father/
+
+For the moment, Pyrana assumes your music is in a directory called ~/music . If
+it isn't, ln it there if you want Pyrana to work. This will, with any luck, be
+changing shortly.
 
 
 CREDIT
