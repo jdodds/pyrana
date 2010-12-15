@@ -1,13 +1,13 @@
---------------------------------------------------------------------------------
-ABOUT
---------------------------------------------------------------------------------
+Pyrana -- A minimalist music player.
+====================================
 
-Pyrana -- a minimalist music player.
+ABOUT
+-----
 
 This program was written out of frustration with larger music players. Pretty
 much all I've ever wanted out of a music player was one that played random
 albums by picking a random artist, then picking a random album, then playing
-that album, then picking _another random artist_.
+that album, then picking another random artist.
 
 For some reason,I've never run into a music player that played random albums
 that way, which led to me often ending up having to skip past multiple albums by
@@ -18,9 +18,8 @@ add last.fm scrobbling capability and other various features. These features
 will, however, be ones that I find useful. I highly doubt this app will ever be
 incredibly bloated.
 
---------------------------------------------------------------------------------
 REQUIREMENTS
---------------------------------------------------------------------------------
+------------
 
 Pyrana WILL NOT WORK if you do not install what is outlined below.
 
@@ -38,16 +37,16 @@ ALSO, you'll need to install gst-python >= 0.10.0, available from
 http://gstreamer.freedesktop.org/src/gst-python/ . This is another dependency
 I'll be most likely removing at some point...
 
---------------------------------------------------------------------------------
+
 CREDIT
---------------------------------------------------------------------------------
+------
 
 Credit is due to Shel from http://kipdreaming.com for the sweet tray
 icons. Thanks, Shel!
 
---------------------------------------------------------------------------------
+
 CONTACT
---------------------------------------------------------------------------------
+-------
 
 Questions? Comments? Suggestions? Hate-mail? Hit me up at
 jeremiah.dodds@gmail.com
