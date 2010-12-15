@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/Usr/bin/env python
 """
 Pyrana -- a minimalist music player.
 
@@ -8,28 +8,13 @@ albums by picking a random artist, then picking a random album, then playing
 that album, then picking _another random artist_.
 
 For some reason,I've never run into a music player that played random albums
-that way, which led to me often ending up having to skip past multiple Frank
-Zappa albums when playing random albums. I like Zappa, but not that goddamned
-much. Same deal with Slayer and Aphex Twin and Bad Religion, and all these
-other artists and bands that I have discographies of.
+that way, which led to me often ending up having to skip past multiple albums by
+a particular artist, especially when the artist has a large discography. 
 
-Another problem I've had is that a lot of 'modern' music players base their
-artist and album information off of metadata. I have a couple of issues with
-this:
-
-1: My music collection is large. Doing a scan of metadata, even if it only
-needs to be done once takes a long time. I hate it.
-
-2: My music collection has unreliable metadata. This is because I'm a lazy
-asshole, and haven't kept up with fixing metadata on music that I
-download. That's right, I download music -- so do you, shut up. My music
-collection is so large that the probability of me fixing the metadata ever is
-basically nil. I can, however, rely on the directory structure of my music
-collection.
-
-This little program does one thing, and does it acceptably -- play random
-albums from a music collection. Maybe it'll expand in the future to include
-things like last.fm support. Maybe.
+While I call this player minimalist, that's not set in stone -- I'll probably
+add last.fm scrobbling capability and other various features. These features
+will, however, be ones that I find useful. I highly doubt this app will ever be
+incredibly bloated.
 """
 
 
@@ -63,14 +48,14 @@ class Pyrana(object):
         """Initialize our player with a root directory to search through for
         music, and start the gtk main thread.
         """
-        self.base_path = os.path.dirname(os.path.realpath(__file__))
+        from pkg_resources import resource_filename
 
         self.status_icon = gtk.StatusIcon()
         self.status_icon.connect('activate', self.on_left_click)
         self.status_icon.connect('popup-menu', self.on_right_click)
         self.status_icon.set_visible(True)
         self.status_icon.set_tooltip("Pyrana!")
-        self.status_icon.set_from_file(os.path.join(self.base_path,'stopped.png'))
+        self.status_icon.set_from_file(resource_filename('pyrana', 'resources/stopped.png'))
         
         self.menu = gtk.Menu()
         skip_song = gtk.MenuItem("Skip Song")
@@ -89,7 +74,7 @@ class Pyrana(object):
         quit_app.show()
         
         self.config = ConfigParser.ConfigParser()
-        self.config.read(os.path.join(self.base_path, 'pyrana.cfg'))
+        self.config.read(resource_filename('pyrana', 'resources/pyrana.cfg'))
 
         self.pidgin_status = self.config.get('main',
                                              'update_pidgin_status')
@@ -138,10 +123,12 @@ class Pyrana(object):
         """Click handler for our status icon. Play or stop playing,
         respectively.
         """
+        from pkg_resources import resource_filename
         if not self.playing:
             self.playing = True
             self.status_icon.set_from_file(
-                os.path.join(self.base_path, 'playing.png'))
+                resource_filename('pyrana', 'resources/playing.png')
+            )
             if not self.cur_song:
                 self.cur_song = self.get_next_song()
                 self.player.set_property('uri', 'file://%s' % self.cur_song)
@@ -155,8 +142,9 @@ class Pyrana(object):
         else:
             self.player.set_state(gst.STATE_PAUSED)
             self.playing = False
-            self.status_icon.set_from_file(os.path.join(
-                    self.base_path, 'stopped.png'))
+            self.status_icon.set_from_file(
+                resource_filename('pyrana', 'resources/stopped.png')
+            )
             self.status_icon.set_tooltip("[PAUSED] %s" % self.cur_song)
             if self.pidgin_status:
                 self.update_pidgin_status()
@@ -223,6 +211,11 @@ class Pyrana(object):
 
             purple.PurpleSavedstatusActivate(status)
 
-if __name__ == '__main__':
-    import sys
+def main():
+    """Entry point for Pyrana.py.
+    Start rockin'
+    """
     Pyrana()
+
+if __name__ == '__main__':
+    main()
