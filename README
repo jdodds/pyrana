@@ -1,3 +1,7 @@
+--------------------------------------------------------------------------------
+ABOUT
+--------------------------------------------------------------------------------
+
 Pyrana -- a minimalist music player.
 
 This program was written out of frustration with larger music players. Pretty
@@ -14,8 +18,36 @@ add last.fm scrobbling capability and other various features. These features
 will, however, be ones that I find useful. I highly doubt this app will ever be
 incredibly bloated.
 
+--------------------------------------------------------------------------------
+REQUIREMENTS
+--------------------------------------------------------------------------------
+
+Pyrana WILL NOT WORK if you do not install what is outlined below.
+
+You'll need PyGTK, available from http://www.pygtk.org/downloads.html . (last
+version I teseted on was 2.22 ) Its setup.py throws a big old warning if you try
+to install it via setuputils, and I've never actually had it successfully
+install that way. On the plus side, your package manager probably provides a
+package, if it's not already on your system.
+
+You'll also need to install python-notify >= 1.1, available from
+http://www.galago-project.org/files/releases/source/notify-python/ . I'll
+probably try to move away from this dependency in the near future.
+
+ALSO, you'll need to install gst-python >= 0.10.0, available from
+http://gstreamer.freedesktop.org/src/gst-python/ . This is another dependency
+I'll be most likely removing at some point...
+
+--------------------------------------------------------------------------------
+CREDIT
+--------------------------------------------------------------------------------
+
 Credit is due to Shel from http://kipdreaming.com for the sweet tray
 icons. Thanks, Shel!
+
+--------------------------------------------------------------------------------
+CONTACT
+--------------------------------------------------------------------------------
 
 Questions? Comments? Suggestions? Hate-mail? Hit me up at
 jeremiah.dodds@gmail.com
