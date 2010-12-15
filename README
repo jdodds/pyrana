@@ -6,28 +6,13 @@ albums by picking a random artist, then picking a random album, then playing
 that album, then picking _another random artist_.
 
 For some reason,I've never run into a music player that played random albums
-that way, which led to me often ending up having to skip past multiple Frank
-Zappa albums when playing random albums. I like Zappa, but not that goddamned
-much. Same deal with Slayer and Aphex Twin and Bad Religion, and all these other
-artists and bands that I have discographies of.
+that way, which led to me often ending up having to skip past multiple albums by
+a particular artist, especially when the artist has a large discography. 
 
-Another problem I've had is that a lot of 'modern' music players base their
-artist and album information off of metadata. I have a couple of issues with
-this:
-
-1: My music collection is large. Doing a scan of metadata, even if it only needs
-to be done once takes a long time. I hate it.
-
-2: My music collection has unreliable metadata. This is because I'm a lazy
-asshole, and haven't kept up with fixing metadata on music that I
-download. That's right, I download music -- so do you, shut up. My music
-collection is so large that the probability of me fixing the metadata ever is
-basically nil. I can, however, rely on the directory structure of my music
-collection.
-
-This little program does one thing, and does it acceptably -- play random albums
-from a music collection. Maybe it'll expand in the future to include things like
-last.fm support. Maybe.
+While I call this player minimalist, that's not set in stone -- I'll probably
+add last.fm scrobbling capability and other various features. These features
+will, however, be ones that I find useful. I highly doubt this app will ever be
+incredibly bloated.
 
 Credit is due to Shel from http://kipdreaming.com for the sweet tray
 icons. Thanks, Shel!
