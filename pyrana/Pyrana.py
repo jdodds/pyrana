@@ -5,11 +5,11 @@ Pyrana -- a minimalist music player.
 This program was written out of frustration with larger music players. Pretty
 much all I've ever wanted out of a music player was one that played random
 albums by picking a random artist, then picking a random album, then playing
-that album, then picking _another random artist_.
+that album, then picking another random artist.
 
 For some reason,I've never run into a music player that played random albums
 that way, which led to me often ending up having to skip past multiple albums by
-a particular artist, especially when the artist has a large discography. 
+a particular artist, especially when the artist has a large discography.
 
 While I call this player minimalist, that's not set in stone -- I'll probably
 add last.fm scrobbling capability and other various features. These features
@@ -58,7 +58,7 @@ class Pyrana(object):
         self.status_icon.set_visible(True)
         self.status_icon.set_tooltip("Pyrana!")
         self.status_icon.set_from_file(resource_filename('pyrana', 'resources/stopped.png'))
-        
+
         self.menu = gtk.Menu()
         skip_song = gtk.MenuItem("Skip Song")
         skip_album = gtk.MenuItem("Skip Album")
@@ -70,18 +70,18 @@ class Pyrana(object):
         skip_song.connect_object("activate", self.skip_song, "Skip Song")
         skip_album.connect_object("activate", self.skip_album, "Skip Album")
         quit_app.connect_object("activate", self.quit, "Quit")
-        
+
         skip_song.show()
         skip_album.show()
         quit_app.show()
-        
+
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.conf_file)
 
         self.pidgin_status = self.config.get('main',
                                              'update_pidgin_status')
         self.use_notify = self.config.get('main', 'use_notify')
-        
+
         #give us a list of sets of albums by artists, assuming the directory
         #structure
         #Artists
@@ -112,7 +112,7 @@ class Pyrana(object):
         self.cur_song = None
         self.cur_album = None
         self.cur_artist = None
-        
+
         gtk.main()
 
     def on_eos(self, bus, msg):
@@ -120,7 +120,7 @@ class Pyrana(object):
         self.cur_song = None
         self.playing = False
         self.on_left_click(None)
-        
+
     def on_left_click(self, widget, data=None):
         """Click handler for our status icon. Play or stop playing,
         respectively.
@@ -140,7 +140,7 @@ class Pyrana(object):
                 self.notify(self.cur_song)
             if self.pidgin_status:
                 self.update_pidgin_status(self.cur_song)
-            
+
         else:
             self.player.set_state(gst.STATE_PAUSED)
             self.playing = False
@@ -150,7 +150,7 @@ class Pyrana(object):
             self.status_icon.set_tooltip("[PAUSED] %s" % self.cur_song)
             if self.pidgin_status:
                 self.update_pidgin_status()
-            
+
     def on_right_click(self, data, event_button, event_time):
         self.menu.popup(None, None, None, event_button, event_time)
 
@@ -158,10 +158,10 @@ class Pyrana(object):
         import os.path
         if not self.cur_album:
             artist = self.cur_artist
-            
+
             while artist == self.cur_artist:
                 artist = random.choice(self.artists)
-                
+
             albumpath = artist.pop(random.randrange(len(artist)))
             self.cur_album = sorted(
                 [os.path.join(albumpath, song)
@@ -188,7 +188,7 @@ class Pyrana(object):
         to_display = "Playing: %s" % songpath
         notification = pynotify.Notification("Pyrana", to_display)
         notification.show()
-    
+
     def update_pidgin_status(self, songpath=None):
         import dbus
         bus = dbus.SessionBus()
@@ -201,7 +201,7 @@ class Pyrana(object):
             message = "%s (%s): %s" % (artist, album, song)
         else:
             message = "Paused"
-        
+
         if "im.pidgin.purple.PurpleService" in bus.list_names():
             purple = bus.get_object("im.pidgin.purple.PurpleService",
                                     "/im/pidgin/purple/PurpleObject",
