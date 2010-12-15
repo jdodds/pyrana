@@ -50,6 +50,8 @@ class Pyrana(object):
         """
         from pkg_resources import resource_filename
 
+        self.__check_and_set_home_config()
+
         self.status_icon = gtk.StatusIcon()
         self.status_icon.connect('activate', self.on_left_click)
         self.status_icon.connect('popup-menu', self.on_right_click)
@@ -74,7 +76,7 @@ class Pyrana(object):
         quit_app.show()
         
         self.config = ConfigParser.ConfigParser()
-        self.config.read(resource_filename('pyrana', 'resources/pyrana.cfg'))
+        self.config.read(self.conf_file)
 
         self.pidgin_status = self.config.get('main',
                                              'update_pidgin_status')
@@ -210,6 +212,25 @@ class Pyrana(object):
             purple.PurpleSavedstatusSetMessage(status, message)
 
             purple.PurpleSavedstatusActivate(status)
+
+    def __check_and_set_home_config(self):
+        import os
+        from pkg_resources import resource_filename
+
+        home = os.path.expanduser('~')
+        conf_dir = os.path.join(home, '.pyrana')
+
+        if not os.path.isdir(conf_dir):
+            os.mkdir(conf_dir)
+
+        conf_file = os.path.join(conf_dir, 'pyrana.cfg')
+        if not os.path.isfile(conf_file):
+            base_conf = resource_filename('pyrana', 'resources/pyrana.cfg')
+
+            import shutil
+            shutil.copy(base_conf, conf_file)
+
+        self.conf_file = conf_file
 
 def main():
     """Entry point for Pyrana.py.
