@@ -56,6 +56,8 @@ what's playing, defaults to True
 
 music_dir :: where your music is located, defaults to ~/music
 
+seen_file :: where to store the file containing hashes of seen songs
+
 update_pidgin_status :: whether you want Pyrana to update your pidgin status for
 you when a track updates, defaults to True
 
