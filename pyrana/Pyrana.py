@@ -81,6 +81,8 @@ class Pyrana(object):
         self.pidgin_status = self.config.get('main',
                                              'update_pidgin_status')
         self.use_notify = self.config.get('main', 'use_notify')
+        self.seen_file = self.config.get('main', 'seen_file')
+        self.__init_seen()
 
         #give us a list of sets of albums by artists, assuming the directory
         #structure
@@ -112,6 +114,7 @@ class Pyrana(object):
         self.cur_song = None
         self.cur_album = None
         self.cur_artist = None
+        self.cur_hash = None
 
         gtk.main()
 
@@ -133,13 +136,20 @@ class Pyrana(object):
             )
             if not self.cur_song:
                 self.cur_song = self.get_next_song()
+                self.__update_hash()
+
+                while self.seen.get(self.cur_hash):
+                    self.cur_song = self.get_next_song()
+                    self.__update_hash()
                 self.player.set_property('uri', 'file://%s' % self.cur_song)
+                self.__update_seen()
             self.player.set_state(gst.STATE_PLAYING)
             self.status_icon.set_tooltip(self.cur_song)
             if self.use_notify:
                 self.notify(self.cur_song)
             if self.pidgin_status:
                 self.update_pidgin_status(self.cur_song)
+
 
         else:
             self.player.set_state(gst.STATE_PAUSED)
@@ -231,6 +241,25 @@ class Pyrana(object):
             shutil.copy(base_conf, conf_file)
 
         self.conf_file = conf_file
+    def __init_seen(self):
+        import pickle
+        self.seen_file = os.path.expanduser(self.seen_file)
+        if os.path.exists(self.seen_file):
+            self.seen = pickle.load(open(self.seen_file, 'r'))
+        else:
+            self.seen = {}
+            
+    def __update_hash(self):
+        from md5 import md5
+        self.cur_hash = md5(self.cur_song).hexdigest()
+
+    def __update_seen(self):
+        import pickle
+        self.seen[self.cur_hash] = True
+        pickle.dump(self.seen, open(self.seen_file, 'w'))
+        
+    
+            
 
 def main():
     """Entry point for Pyrana.py.
