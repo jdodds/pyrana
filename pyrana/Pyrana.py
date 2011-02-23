@@ -26,13 +26,11 @@ import pygst
 pygst.require("0.10")
 import gst
 
-import pygtk
-pygtk.require('2.0')
-import gtk
-
 import pynotify
 pynotify.init("Basics")
 
+from feather import Application
+from pyrana.uis import GTK2
 
 class Pyrana(object):
     """Our player, sending sweet, sweet sounds to our speakers.
@@ -52,28 +50,9 @@ class Pyrana(object):
 
         self.__check_and_set_home_config()
 
-        self.status_icon = gtk.StatusIcon()
-        self.status_icon.connect('activate', self.on_left_click)
-        self.status_icon.connect('popup-menu', self.on_right_click)
-        self.status_icon.set_visible(True)
-        self.status_icon.set_tooltip("Pyrana!")
-        self.status_icon.set_from_file(resource_filename('pyrana', 'resources/stopped.png'))
+        
 
-        self.menu = gtk.Menu()
-        skip_song = gtk.MenuItem("Skip Song")
-        skip_album = gtk.MenuItem("Skip Album")
-        quit_app = gtk.MenuItem("Quit")
-        self.menu.append(skip_song)
-        self.menu.append(skip_album)
-        self.menu.append(quit_app)
 
-        skip_song.connect_object("activate", self.skip_song, "Skip Song")
-        skip_album.connect_object("activate", self.skip_album, "Skip Album")
-        quit_app.connect_object("activate", self.quit, "Quit")
-
-        skip_song.show()
-        skip_album.show()
-        quit_app.show()
 
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.conf_file)
@@ -161,9 +140,6 @@ class Pyrana(object):
             if self.pidgin_status:
                 self.update_pidgin_status()
 
-    def on_right_click(self, data, event_button, event_time):
-        self.menu.popup(None, None, None, event_button, event_time)
-
     def get_next_song(self):
         import os.path
         if not self.cur_album:
@@ -189,8 +165,6 @@ class Pyrana(object):
         self.cur_album = None
         self.on_eos(None, None)
 
-    def quit(widget, data=None):
-        gtk.main_quit()
 
     def notify(self, songpath):
         """Use libnotify to show growl-like alerts about what's playing.
@@ -265,7 +239,10 @@ def main():
     """Entry point for Pyrana.py.
     Start rockin'
     """
-    Pyrana()
+    pyrana = Application(['play', 'pause', 'stop'])
+    pyrana.register(GTK2())
+    pyrana.start()
+#    Pyrana()
 
 if __name__ == '__main__':
     main()

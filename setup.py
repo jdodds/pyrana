@@ -17,6 +17,7 @@ setup(
     },
     scripts = ['pyrana/Pyrana.py'],
     setup_requires = ['setuptools_git >= 0.3'],
+    install_requires = ['nose >= 1.0.0', 'feather >=0.1dev'],
     zip_safe = False,
     author = "Jeremiah Dodds",
     author_email = "jeremiah.dodds@gmail.com",
