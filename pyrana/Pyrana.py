@@ -22,15 +22,13 @@ import os
 import random
 import ConfigParser
 
-import pygst
-pygst.require("0.10")
-import gst
-
 import pynotify
 pynotify.init("Basics")
 
 from feather import Application
 from pyrana.uis import GTK2
+from pyrana.players import PyGST
+from pyrana.playlists import SaneRandomAlbums
 
 class Pyrana(object):
     """Our player, sending sweet, sweet sounds to our speakers.
@@ -50,10 +48,6 @@ class Pyrana(object):
 
         self.__check_and_set_home_config()
 
-        
-
-
-
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.conf_file)
 
@@ -63,12 +57,7 @@ class Pyrana(object):
         self.seen_file = self.config.get('main', 'seen_file')
         self.__init_seen()
 
-        #give us a list of sets of albums by artists, assuming the directory
-        #structure
-        #Artists
-        # Albums
-        #  Songs
-        #This is a little ugly, but whatever.
+
         root = os.path.expanduser(
             self.config.get('main', 'music_dir'))
         self.artists = [[os.path.join(artist, album)
@@ -82,14 +71,8 @@ class Pyrana(object):
         #just in case we get some empty directories
         self.artists = [a for a in self.artists if a]
 
-        self.player = gst.element_factory_make("playbin2", "player")
 
-        bus = self.player.get_bus()
-        bus.add_signal_watch()
-        bus.enable_sync_message_emission()
-        bus.connect('message::eos', self.on_eos)
 
-        self.playing = False
         self.cur_song = None
         self.cur_album = None
         self.cur_artist = None
@@ -120,9 +103,9 @@ class Pyrana(object):
                 while self.seen.get(self.cur_hash):
                     self.cur_song = self.get_next_song()
                     self.__update_hash()
-                self.player.set_property('uri', 'file://%s' % self.cur_song)
+
                 self.__update_seen()
-            self.player.set_state(gst.STATE_PLAYING)
+
             self.status_icon.set_tooltip(self.cur_song)
             if self.use_notify:
                 self.notify(self.cur_song)
@@ -131,11 +114,10 @@ class Pyrana(object):
 
 
         else:
-            self.player.set_state(gst.STATE_PAUSED)
-            self.playing = False
             self.status_icon.set_from_file(
                 resource_filename('pyrana', 'resources/stopped.png')
             )
+
             self.status_icon.set_tooltip("[PAUSED] %s" % self.cur_song)
             if self.pidgin_status:
                 self.update_pidgin_status()
@@ -158,12 +140,8 @@ class Pyrana(object):
         self.cur_album = self.cur_album[1:]
         return song
 
-    def skip_song(self, data=None):
-        self.on_eos(None, None)
-
     def skip_album(self, data=None):
         self.cur_album = None
-        self.on_eos(None, None)
 
 
     def notify(self, songpath):
@@ -239,8 +217,12 @@ def main():
     """Entry point for Pyrana.py.
     Start rockin'
     """
-    pyrana = Application(['play', 'pause', 'stop'])
-    pyrana.register(GTK2())
+#    pyrana = Application(['play', 'pause'])
+    pyrana = Application(['play'])
+    p = GTK2()
+    pyrana.register(p)
+#    pyrana.register(PyGST())
+    pyrana.register(SaneRandomAlbums('~/music'))
     pyrana.start()
 #    Pyrana()
 
