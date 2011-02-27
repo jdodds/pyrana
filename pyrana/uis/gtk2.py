@@ -33,6 +33,7 @@ class GTK2(Plugin):
             'songstart' : self.handle_songplaying,
             'songresume' : self.handle_songplaying,
             'songpause' : self.handle_songstopped,
+            'SHUTDOWN' : self.shutdown
         }
 
         first = True

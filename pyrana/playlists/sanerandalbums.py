@@ -36,12 +36,14 @@ class SaneRandomAlbums(Plugin):
             'skipsong': self.next_song,
             'skipalbum': self.next_album,
             'albumstart' : self.next_song,
-            'albumend' : self.next_album}
+            'albumend' : self.next_album,
+            'SHUTDOWN' : self.shutdown}
 
-        while True:
+        while self.alive:
             message, payload = self.listener.get()
             print 'playlist got %s %s' % (message, payload)
             message_funcs[message](payload)
+        print 'stopped'
 
     def next_album(self, payload):
         print 'next album got %s' % payload
