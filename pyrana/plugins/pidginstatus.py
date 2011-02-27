@@ -13,7 +13,7 @@ class PidginStatus(Plugin):
             'songpause' : self.handle_pause,
             'songresume' : self.handle_resume}
 
-        while self.alive:
+        while self.runnable:
             message, payload = self.listener.get()
             message_funcs[message](payload)
 

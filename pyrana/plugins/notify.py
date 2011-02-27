@@ -12,7 +12,7 @@ class Notify(Plugin):
             'SHUTDOWN' : self.shutdown,
             'songloaded' : self.handle_songloaded}
 
-        while self.alive:
+        while self.runnable:
             message, payload = self.listener.get()
             message_funcs[message](payload)
 

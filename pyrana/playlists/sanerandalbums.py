@@ -1,11 +1,11 @@
 import os, random
-from pkg_resources import resource_filename
 
 from feather import Plugin
 
 class SaneRandomAlbums(Plugin):
     listeners = set(['play', 'skipsong', 'skipalbum', 'albumstart', 'albumend', 'songend'])
     messengers = set(['songloaded', 'albumstart', 'albumend'])
+    name = 'SaneRandomAlbums'
 
     audio_types = set(['.mp3', '.m4a', '.ogg'])
 
@@ -39,7 +39,7 @@ class SaneRandomAlbums(Plugin):
             'songend' : self.next_song,
             'SHUTDOWN' : self.shutdown}
 
-        while self.alive:
+        while self.runnable:
             message, payload = self.listener.get()
             message_funcs[message](payload)
 

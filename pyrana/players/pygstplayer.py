@@ -4,11 +4,12 @@ import gst, gobject
 
 from feather import Plugin
 
-class PyGST(Plugin):
+class PyGSTPlayer(Plugin):
     """A player based on gstreamer"""
 
     listeners = set(['songloaded', 'pause', 'skipsong', 'skipalbum'])
     messengers = set(['songstart', 'songpause', 'songend', 'songresume'])
+    name = 'PyGSTPlayer'
 
     def run(self):
         gobject.threads_init()
@@ -26,20 +27,17 @@ class PyGST(Plugin):
             'skipalbum' : self.stop,
             'SHUTDOWN' : self.shutdown}
 
-        first = True
-        while self.alive:
+        while self.runnable:
             message, payload = self.listener.get()
             message_funcs[message](payload)
 
     def on_eos(self, bus=None, msg=None):
         self.send('songend')
 
-    
     def stop(self, payload=None):
         self.player.set_state(gst.STATE_NULL)
         self.player.set_state(gst.STATE_READY)
         self.playing = False
-
 
     def handle_songloaded(self, songpath):
         self.stop()

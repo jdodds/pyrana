@@ -11,6 +11,7 @@ ENDEVENT=42
 class PyGamePlayer(Plugin):
     listeners = set(['songloaded', 'pause', 'skipsong', 'skipalbum'])
     messengers = set(['songstart', 'songpause', 'songend', 'songresume'])
+    name = 'PyGamePlayer'
 
     def run(self):
         pygame.display.init()
@@ -27,12 +28,12 @@ class PyGamePlayer(Plugin):
             'skipalbum' : self.handle_skipalbum,
             'SHUTDOWN' : self.shutdown}
         
-        while self.alive:
+        while self.runnable:
             message, payload = self.listener.get()
             message_funcs[message](payload)
 
     def _songend_bubble(s,self):
-        while self.alive:
+        while self.runnable:
             event = pygame.event.get(ENDEVENT)
             if event:
                 self.send('songend')

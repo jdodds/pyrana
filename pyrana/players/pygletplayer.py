@@ -4,6 +4,7 @@ from feather import Plugin
 class PygletPlayer(Plugin):
     listeners = set(['songloaded', 'pause', 'skipsong', 'skipalbum'])
     messengers = set(['songstart', 'songpause', 'songend', 'songresume'])
+    name = 'PygletPlayer'
 
     def run(self):
         pyglet.options['audio'] = ('alsa', 'directsound', 'openal', 'silent')
@@ -17,7 +18,7 @@ class PygletPlayer(Plugin):
             'skipalbum' : self.handle_skipalbum,
             'SHUTDOWN' : self.shutdown}
         
-        while self.alive:
+        while self.runnable:
             message, payload = self.listener.get()
             message_funcs[message](payload)        
 
@@ -26,7 +27,6 @@ class PygletPlayer(Plugin):
             song = pyglet.media.load(payload)
         except pyglet.media.MediaException:
             print 'unsupported file %s' % payload
-#            self.send('songend')
         else:
             self.playing = True
             if self.player:

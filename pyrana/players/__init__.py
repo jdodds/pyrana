@@ -1,3 +1,3 @@
-from pygstplayer import PyGST
+from pygstplayer import PyGSTPlayer
 from pygameplayer import PyGamePlayer
 from pygletplayer import PygletPlayer

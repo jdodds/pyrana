@@ -1,5 +1,4 @@
 from pkg_resources import resource_filename
-from multiprocessing import Process
 
 from feather import Plugin
 
@@ -7,14 +6,12 @@ import pygtk
 pygtk.require('2.0')
 import gtk, gobject
 
-import thread, sys, threading
-
-
 class GTK2(Plugin):
     """A simplistic interface of nothing but a tray icon"""
 
     listeners = set(['APP_START'])
-    messengers = set(['APP_END', 'play', 'pause', 'skipsong', 'skipalbum'])
+    messengers = set(['APP_STOP', 'play', 'pause', 'skipsong', 'skipalbum'])
+    name = 'GTK2'
 
     playing_icon = resource_filename('pyrana', 'resources/playing.png')
     stopped_icon = resource_filename('pyrana', 'resources/stopped.png')
@@ -22,12 +19,10 @@ class GTK2(Plugin):
     def __init__(self):
         super(GTK2, self).__init__()
         self.playing = False
-        self.alive = False
         self.first_played = False
 
     def run(self):
         gtk.gdk.threads_init()
-        self.alive = True
 
         message_funcs = {
             'APP_START' : self.handle_APP_START,
@@ -35,7 +30,7 @@ class GTK2(Plugin):
         }
 
         first = True
-        while self.alive:
+        while self.runnable:
             gtk.threads_enter()
             message, payload = self.listener.get()
             message_funcs[message](payload)
@@ -92,7 +87,7 @@ class GTK2(Plugin):
         self.menu.popup(None, None, None, event_button, event_time)
 
     def quit(self, widget, data=None):
-        self.alive = False
+        self.runnable = False
         gtk.main_quit()
 
     def on_left_click(self, widget=None, data=None):
