@@ -19,9 +19,10 @@ class PyGST(Plugin):
             'songloaded' : self.handle_songloaded,
             'pause' : self.handle_pause,
             'skipsong' : self.on_eos,
-            'skipalbum' : self.on_eos}
+            'skipalbum' : self.on_eos,
+            'SHUTDOWN' : self.shutdown}
 
-        while True:
+        while self.alive:
 #        def check_stuff():
             message, payload = self.listener.get()
             message_funcs[message](payload)
@@ -34,32 +35,32 @@ class PyGST(Plugin):
         self.send('songend')
 
     def handle_APP_START(self, payload):
-#        self.player = gst.element_factory_make("playbin2", "player")
+        self.player = gst.element_factory_make("playbin2", "player")
         self.playing = False
         
-        # self.bus = self.player.get_bus()
-        # self.bus.add_signal_watch()
-        # self.bus.enable_sync_message_emission()
-        # def on_eos():
-        #     print 'eos non self'
-        # self.bus.connect('message::eos', self.on_eos)
-        # self.bus.connect('message::eos', on_eos)
+        self.bus = self.player.get_bus()
+        self.bus.add_signal_watch()
+        self.bus.enable_sync_message_emission()
+        def on_eos():
+            print 'eos non self'
+        self.bus.connect('message::eos', self.on_eos)
+        self.bus.connect('message::eos', on_eos)
         print "connected"
 
 
     def handle_songloaded(self, songpath):
-        # self.player.set_property('uri', 'file://%s' % songpath)
-        # self.player.set_state(gst.STATE_PLAYING)
+        self.player.set_property('uri', 'file://%s' % songpath)
+        self.player.set_state(gst.STATE_PLAYING)
         self.playing = True
         self.send('songstart', songpath)
 
     def handle_pause(self, payload):
         if self.playing:
-#            self.player.set_state(gst.STATE_PAUSED)
+            self.player.set_state(gst.STATE_PAUSED)
             self.playing = False
             self.send('songpause')
         else:
- #           self.player.set_state(gst.STATE_PLAYING)
+            self.player.set_state(gst.STATE_PLAYING)
             self.playing = True
             self.send('songresume')
 

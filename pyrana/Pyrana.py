@@ -221,7 +221,7 @@ def main():
     pyrana = Application([])
     p = GTK2()
     pyrana.register(p)
-#    pyrana.register(PyGST())
+    pyrana.register(PyGST())
     pyrana.register(SaneRandomAlbums('~/music'))
     pyrana.start()
 #    Pyrana()
