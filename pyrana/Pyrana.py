@@ -219,7 +219,7 @@ def main():
     from pyrana.uis import GTK2
     from pyrana.players import PyGST
     from pyrana.playlists import SaneRandomAlbums
-    from pyrana.plugins import Notify
+    from pyrana.plugins import Notify, PidginStatus
 
     pyrana = Application(['play', 'pause'])
 #    pyrana = Application([])
@@ -228,6 +228,7 @@ def main():
     pyrana.register(PyGST())
     pyrana.register(SaneRandomAlbums('~/music'))
     pyrana.register(Notify())
+    pyrana.register(PidginStatus())
     pyrana.start()
 #    Pyrana()
 
