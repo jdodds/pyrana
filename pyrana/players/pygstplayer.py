@@ -32,16 +32,10 @@ class PyGST(Plugin):
             message_funcs[message](payload)
 
     def on_eos(self, bus=None, msg=None):
-#        self.stop()
         self.send('songend')
 
     
     def stop(self, payload=None):
-        # gobject.idle_add(
-        #     self._set_state,
-        #     gst.STATE_NULL,
-        #     priority=gobject.PRIORITY_HIGH)
-        # gobject.idle_add(self._set_state, gst.STATE_READY)
         self.player.set_state(gst.STATE_NULL)
         self.player.set_state(gst.STATE_READY)
         self.playing = False
