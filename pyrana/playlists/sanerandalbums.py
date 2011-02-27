@@ -46,6 +46,7 @@ class SaneRandomAlbums(Plugin):
     def next_album(self, payload):
         while self.current_artist == self.last_artist:
             self.current_artist = random.choice(self.artistdata)
+        self.last_artist = self.current_artist
 
         albumpath = self.current_artist.pop(
             random.randrange(len(self.current_artist)))
