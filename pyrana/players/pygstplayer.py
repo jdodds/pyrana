@@ -7,10 +7,17 @@ from feather import Plugin
 class PyGST(Plugin):
     """A player based on gstreamer"""
 
-    listeners = set(['APP_START', 'songloaded', 'pause', 'skipsong', 'skipalbum'])
+    listeners = set(['songloaded', 'pause', 'skipsong', 'skipalbum'])
     messengers = set(['songstart', 'songpause', 'songend', 'songresume'])
 
     def run(self):
+        gobject.threads_init()
+        self.player = gst.element_factory_make("playbin2", "player")
+        fakesink = gst.element_factory_make('fakesink', 'fakesink')
+        self.player.set_property('video-sink', fakesink)
+        self.playing = False
+        self.player.connect('about-to-finish', self.on_eos)
+
         message_funcs = {
             'APP_START' : self.handle_APP_START,
             'songloaded' : self.handle_songloaded,
@@ -27,27 +34,11 @@ class PyGST(Plugin):
     def on_eos(self, bus=None, msg=None):
         self.stop()
         self.send('songend')
-    def on_message(self, bus, message):
-        print 'MESSAGE got %s %s' % (bus, message)
         
     def stop(self, payload=None):
         self.player.set_state(gst.STATE_NULL)
+        self.player.set_state(gst.STATE_READY)
         self.playing = False
-
-    def handle_APP_START(self, payload):
-        self.player = gst.element_factory_make("playbin2", "player")
-        fakesink = gst.element_factory_make('fakesink', 'fakesink')
-        self.player.set_property('video-sink', fakesink)
-        self.playing = False
-        
-        bus = self.player.get_bus()
-        bus.add_signal_watch()
-#        bus.enable_sync_message_emission()
-        def on_eos():
-            print 'eos non self'
-        bus.connect('message', self.on_message)
-        # bus.connect('message::eos', self.on_eos)
-        # bus.connect('message::eos', on_eos)
 
     def handle_songloaded(self, songpath):
         self.player.set_property('uri', 'file://%s' % songpath)
