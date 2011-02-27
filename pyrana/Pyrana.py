@@ -218,11 +218,11 @@ def main():
     Start rockin'
     """
 #    pyrana = Application(['play', 'pause'])
-    pyrana = Application(['play'])
+    pyrana = Application([])
     p = GTK2()
     pyrana.register(p)
 #    pyrana.register(PyGST())
-    pyrana.register(SaneRandomAlbums('~/music'))
+#    pyrana.register(SaneRandomAlbums('~/music'))
     pyrana.start()
 #    Pyrana()
 

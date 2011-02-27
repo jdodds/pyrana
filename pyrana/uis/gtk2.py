@@ -22,10 +22,12 @@ class GTK2(Plugin):
     def __init__(self):
         super(GTK2, self).__init__()
         self.first_song_started = False
+        self.alive = False
 
     def run(self):
         gtk.gdk.threads_init()
-#        gobject.threads_init()
+        self.alive = True
+
         message_funcs = {
             'APP_START' : self.handle_APP_START,
             'songstart' : self.handle_songplaying,
@@ -34,19 +36,24 @@ class GTK2(Plugin):
         }
 
         first = True
-        while True:
-#                gtk.main()
+        while self.alive:
+            gtk.threads_enter()
             message, payload = self.listener.get()
             message_funcs[message](payload)
             if first:
                 first = False
-                thread.start_new_thread(gtk.main, ())
+                gtk.main()
+            gtk.threads_leave()
 
+        print 'stopping'
+        super(GTK2, self).send('APP_STOP')
 
-#                threading.Thread(target=gtk.main).start()
 
     def send(self, message, payload=None):
-        gobject.idle_add(super(GTK2, self).send, message, payload)
+        def run_send():
+            super(GTK2, self).send(message, payload)
+            return False
+        gobject.idle_add(run_send)
 
     def handle_APP_START(self, payload):
         self.status_icon = gtk.StatusIcon()
@@ -76,7 +83,6 @@ class GTK2(Plugin):
         skip_song.show()
         skip_album.show()
         quit_app.show()
-#hmm        pass
 
     def skip_song(self, *args):
         self.send('skipsong')
@@ -88,12 +94,8 @@ class GTK2(Plugin):
         self.menu.popup(None, None, None, event_button, event_time)
 
     def quit(self, widget, data=None):
-#        gobject.idle_add(gtk.main_quit)
-#        thread.start_new_thread(gtk.main_quit, ())
-#        gtk.main_quit()
-#        gtk.gdk.threads_leave()
-#        thread.exit()
-        self.send('APP_STOP')
+        self.alive = False
+        gtk.main_quit()
 
     def handle_songplaying(self, payload):
         self.status_icon.set_from_file(resource_filename('pyrana', 'resources/playing.png'))

@@ -34,16 +34,16 @@ class PyGST(Plugin):
         self.send('songend')
 
     def handle_APP_START(self, payload):
-        self.player = gst.element_factory_make("playbin2", "player")
+#        self.player = gst.element_factory_make("playbin2", "player")
         self.playing = False
         
-        self.bus = self.player.get_bus()
-        self.bus.add_signal_watch()
-        self.bus.enable_sync_message_emission()
-        def on_eos():
-            print 'eos non self'
-        self.bus.connect('message::eos', self.on_eos)
-        self.bus.connect('message::eos', on_eos)
+        # self.bus = self.player.get_bus()
+        # self.bus.add_signal_watch()
+        # self.bus.enable_sync_message_emission()
+        # def on_eos():
+        #     print 'eos non self'
+        # self.bus.connect('message::eos', self.on_eos)
+        # self.bus.connect('message::eos', on_eos)
         print "connected"
 
 
