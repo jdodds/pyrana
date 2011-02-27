@@ -217,7 +217,7 @@ def main():
 
     from feather import Application
     from pyrana.uis import GTK2
-    from pyrana.players import PyGST
+    from pyrana.players import PyGST, PyGamePlayer
     from pyrana.playlists import SaneRandomAlbums
     from pyrana.plugins import Notify, PidginStatus
 
@@ -225,7 +225,8 @@ def main():
 #    pyrana = Application([])
     p = GTK2()
     pyrana.register(p)
-    pyrana.register(PyGST())
+#    pyrana.register(PyGST())
+    pyrana.register(PyGamePlayer())
     pyrana.register(SaneRandomAlbums('~/music'))
     pyrana.register(Notify())
     pyrana.register(PidginStatus())
