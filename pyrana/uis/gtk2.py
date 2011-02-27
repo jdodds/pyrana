@@ -23,6 +23,7 @@ class GTK2(Plugin):
         super(GTK2, self).__init__()
         self.playing = False
         self.alive = False
+        self.first_played = False
 
     def run(self):
         gtk.gdk.threads_init()
@@ -102,7 +103,11 @@ class GTK2(Plugin):
         else:
             self.playing = True
             self.status_icon.set_from_file(self.playing_icon)
-            self.send('play')
+            if self.first_played:
+                self.send('pause')
+            else:
+                self.first_played = True
+                self.send('play')
 
 
 
