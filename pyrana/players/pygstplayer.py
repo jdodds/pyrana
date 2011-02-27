@@ -19,7 +19,6 @@ class PyGST(Plugin):
         self.player.connect('about-to-finish', self.on_eos)
 
         message_funcs = {
-            'APP_START' : self.handle_APP_START,
             'songloaded' : self.handle_songloaded,
             'pause' : self.handle_pause,
             'skipsong' : self.stop,
