@@ -217,8 +217,8 @@ def main():
     """Entry point for Pyrana.py.
     Start rockin'
     """
-#    pyrana = Application(['play', 'pause'])
-    pyrana = Application([])
+    pyrana = Application(['play', 'pause'])
+#    pyrana = Application([])
     p = GTK2()
     pyrana.register(p)
     pyrana.register(PyGST())

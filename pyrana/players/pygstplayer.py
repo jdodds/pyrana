@@ -10,9 +10,6 @@ class PyGST(Plugin):
     listeners = set(['APP_START', 'songloaded', 'pause', 'skipsong', 'skipalbum'])
     messengers = set(['songstart', 'songpause', 'songend', 'songresume'])
 
-    # def __init__(self):
-    #     super(PyGST, self).__init__()
-
     def run(self):
         message_funcs = {
             'APP_START' : self.handle_APP_START,
@@ -23,13 +20,11 @@ class PyGST(Plugin):
             'SHUTDOWN' : self.shutdown}
 
         while self.alive:
-#        def check_stuff():
             message, payload = self.listener.get()
             message_funcs[message](payload)
-#        gobject.idle_add(check_stuff)
-            
 
     def on_eos(self, bus=None, msg=None):
+        print 'in eos %s %s' % (bus, msg)
         self.player.set_state(gst.STATE_NULL)
         self.playing = False
         self.send('songend')
@@ -45,8 +40,6 @@ class PyGST(Plugin):
             print 'eos non self'
         self.bus.connect('message::eos', self.on_eos)
         self.bus.connect('message::eos', on_eos)
-        print "connected"
-
 
     def handle_songloaded(self, songpath):
         self.player.set_property('uri', 'file://%s' % songpath)

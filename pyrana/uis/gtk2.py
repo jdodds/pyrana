@@ -13,7 +13,7 @@ import thread, sys, threading
 class GTK2(Plugin):
     """A simplistic interface of nothing but a tray icon"""
 
-    listeners = set(['APP_START', 'songstart', 'songpause', 'songresume'])
+    listeners = set(['APP_START'])
     messengers = set(['APP_END', 'play', 'pause', 'skipsong', 'skipalbum'])
 
     playing_icon = resource_filename('pyrana', 'resources/playing.png')
@@ -21,7 +21,7 @@ class GTK2(Plugin):
 
     def __init__(self):
         super(GTK2, self).__init__()
-        self.first_song_started = False
+        self.playing = False
         self.alive = False
 
     def run(self):
@@ -30,9 +30,6 @@ class GTK2(Plugin):
 
         message_funcs = {
             'APP_START' : self.handle_APP_START,
-            'songstart' : self.handle_songplaying,
-            'songresume' : self.handle_songplaying,
-            'songpause' : self.handle_songstopped,
             'SHUTDOWN' : self.shutdown
         }
 
@@ -46,7 +43,6 @@ class GTK2(Plugin):
                 gtk.main()
             gtk.threads_leave()
 
-        print 'stopping'
         super(GTK2, self).send('APP_STOP')
 
 
@@ -98,17 +94,14 @@ class GTK2(Plugin):
         self.alive = False
         gtk.main_quit()
 
-    def handle_songplaying(self, payload):
-        self.status_icon.set_from_file(resource_filename('pyrana', 'resources/playing.png'))
-
-    def handle_songstopped(self, payload):
-        self.status_icon.set_from_file(resource_filename('pyrana', 'resources/stopped.png'))
-
     def on_left_click(self, widget=None, data=None):
-        if self.first_song_started:
+        if self.playing:
+            self.playing = False
+            self.status_icon.set_from_file(self.stopped_icon)
             self.send('pause')
         else:
-            self.first_song_started = True
+            self.playing = True
+            self.status_icon.set_from_file(self.playing_icon)
             self.send('play')
 
 

@@ -4,7 +4,7 @@ from pkg_resources import resource_filename
 from feather import Plugin
 
 class SaneRandomAlbums(Plugin):
-    listeners = set(['play', 'skipsong', 'skipalbum', 'albumstart', 'albumend'])
+    listeners = set(['play', 'skipsong', 'skipalbum', 'albumstart', 'albumend', 'songend'])
     messengers = set(['songloaded', 'albumstart', 'albumend'])
 
     audio_types = set(['.mp3', '.m4a', '.ogg'])
@@ -29,7 +29,6 @@ class SaneRandomAlbums(Plugin):
 
         self.last_artist = self.current_artist = None
 
-#    def recieve(self, message, payload):
     def run(self):
         message_funcs = {
             'play': self.next_album,
@@ -37,16 +36,14 @@ class SaneRandomAlbums(Plugin):
             'skipalbum': self.next_album,
             'albumstart' : self.next_song,
             'albumend' : self.next_album,
+            'songend' : self.next_song,
             'SHUTDOWN' : self.shutdown}
 
         while self.alive:
             message, payload = self.listener.get()
-            print 'playlist got %s %s' % (message, payload)
             message_funcs[message](payload)
-        print 'stopped'
 
     def next_album(self, payload):
-        print 'next album got %s' % payload
         while self.current_artist == self.last_artist:
             self.current_artist = random.choice(self.artistdata)
 
@@ -58,18 +55,14 @@ class SaneRandomAlbums(Plugin):
              for song in os.listdir(albumpath)
              if os.path.splitext(song)[-1] in self.audio_types])
         
-        print 'next album %s' % albumpath
         self.send('albumstart', albumpath)
 
     def next_song(self, payload):
-        print 'next song got %s' % payload
         if len(self.current_album) == 0:
-            print 'sending albumend'
             self.send('albumend')
         else:
             song = self.current_album[0]
             self.current_album = self.current_album[1:]
-            print 'sending songloaded %s' % song
             self.send('songloaded', song)
             
         
