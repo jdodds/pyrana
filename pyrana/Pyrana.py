@@ -25,10 +25,7 @@ import ConfigParser
 import pynotify
 pynotify.init("Basics")
 
-from feather import Application
-from pyrana.uis import GTK2
-from pyrana.players import PyGST
-from pyrana.playlists import SaneRandomAlbums
+
 
 class Pyrana(object):
     """Our player, sending sweet, sweet sounds to our speakers.
@@ -217,12 +214,20 @@ def main():
     """Entry point for Pyrana.py.
     Start rockin'
     """
+
+    from feather import Application
+    from pyrana.uis import GTK2
+    from pyrana.players import PyGST
+    from pyrana.playlists import SaneRandomAlbums
+    from pyrana.plugins import Notify
+
     pyrana = Application(['play', 'pause'])
 #    pyrana = Application([])
     p = GTK2()
     pyrana.register(p)
     pyrana.register(PyGST())
     pyrana.register(SaneRandomAlbums('~/music'))
+    pyrana.register(Notify())
     pyrana.start()
 #    Pyrana()
 
