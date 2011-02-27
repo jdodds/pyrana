@@ -35,12 +35,9 @@ class PyGamePlayer(Plugin):
         while self.alive:
             event = pygame.event.get(ENDEVENT)
             if event:
-                print event
                 self.send('songend')
             else:
                 time.sleep(0.1)
-                
-        print 'done'
                 
     def handle_songloaded(self, payload):
         try:
