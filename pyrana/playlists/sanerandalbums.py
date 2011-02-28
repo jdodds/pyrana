@@ -1,4 +1,5 @@
-import os, random
+import os, random, pickle
+from md5 import md5
 
 from feather import Plugin
 
@@ -9,7 +10,7 @@ class SaneRandomAlbums(Plugin):
 
     audio_types = set(['.mp3', '.m4a', '.ogg'])
 
-    def __init__(self, musicdir):
+    def __init__(self, musicdir, seen_file):
         super(SaneRandomAlbums, self).__init__()
         # give us a list of sets of albums by artists, assuming the directory
         # structure:
@@ -28,6 +29,16 @@ class SaneRandomAlbums(Plugin):
         self.artistdata = filter(None, artistdata)
 
         self.last_artist = self.current_artist = None
+        self.seen_file = seen_file
+        self.__init_seen()
+
+    def __init_seen(self):
+        self.seen_file = os.path.expanduser(self.seen_file)
+        if os.path.exists(self.seen_file):
+            self.seen = pickle.load(open(self.seen_file, 'r'))
+        else:
+            self.seen = {}
+        self.current_album_hash = None
 
     def run(self):
         message_funcs = {
@@ -44,22 +55,35 @@ class SaneRandomAlbums(Plugin):
             message_funcs[message](payload)
 
     def next_album(self, payload):
+
         while self.current_artist == self.last_artist:
             self.current_artist = random.choice(self.artistdata)
         self.last_artist = self.current_artist
 
         albumpath = self.current_artist.pop(
             random.randrange(len(self.current_artist)))
+
+        album_hash = md5(albumpath).hexdigest()
+
+        while album_hash in self.seen:
+            albumpath = self.current_artist.pop(
+                random.randrange(len(self.current_artist)))
+            album_hash = md5(albumpath).hexdigest()
+
+        self.seen[self.current_album_hash] = True
+        
+        self.current_album_hash = album_hash
         
         self.current_album = sorted(
             [os.path.join(albumpath, song)
              for song in os.listdir(albumpath)
              if os.path.splitext(song)[-1] in self.audio_types])
-        
+
         self.send('albumstart', albumpath)
 
     def next_song(self, payload):
         if len(self.current_album) == 0:
+            pickle.dump(self.seen, open(self.seen_file, 'w'))
             self.send('albumend')
         else:
             song = self.current_album[0]

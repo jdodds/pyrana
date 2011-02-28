@@ -90,7 +90,7 @@ def main():
     pyrana = Application(['play', 'pause', 'skipsong', 'skipalbum'])
     pyrana.register(GTK2())
     pyrana.register(PyGSTPlayer())
-    pyrana.register(SaneRandomAlbums('~/music'))
+    pyrana.register(SaneRandomAlbums('~/music', '~/.pyrana/seen'))
     pyrana.register(Notify())
     pyrana.register(PidginStatus())
     pyrana.start()
