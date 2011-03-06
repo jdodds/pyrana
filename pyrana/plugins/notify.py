@@ -7,16 +7,7 @@ class Notify(Plugin):
     listeners = set(['songloaded'])
     messengers = set()
 
-    def run(self):
-        message_funcs = {
-            'SHUTDOWN' : self.shutdown,
-            'songloaded' : self.handle_songloaded}
-
-        while self.runnable:
-            message, payload = self.listener.get()
-            message_funcs[message](payload)
-
-    def handle_songloaded(self, payload):
+    def songloaded(self, payload):
         msg = "Playing: %s" % payload
         notification = pynotify.Notification("Pyrana", msg)
         notification.show()

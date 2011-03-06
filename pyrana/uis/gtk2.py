@@ -21,26 +21,20 @@ class GTK2(Plugin):
         self.playing = False
         self.first_played = False
 
-    def run(self):
+    def pre_run(self):
         gtk.gdk.threads_init()
 
-        message_funcs = {
-            'APP_START' : self.handle_APP_START,
-            'SHUTDOWN' : self.shutdown
-        }
+    def pre_call_message(self):
+        gtk.threads_enter()
 
-        first = True
-        while self.runnable:
-            gtk.threads_enter()
-            message, payload = self.listener.get()
-            message_funcs[message](payload)
-            if first:
-                first = False
-                gtk.main()
-            gtk.threads_leave()
+    def post_first_call_message(self):
+        gtk.main()
 
+    def post_call_message(self):
+        gtk.threads_leave()
+
+    def post_run(self):
         super(GTK2, self).send('APP_STOP')
-
 
     def send(self, message, payload=None):
         def run_send():
@@ -48,7 +42,7 @@ class GTK2(Plugin):
             return False
         gobject.idle_add(run_send)
 
-    def handle_APP_START(self, payload):
+    def APP_START(self, payload):
         self.status_icon = gtk.StatusIcon()
         self.status_icon.connect('activate', self.on_left_click)
         self.status_icon.connect('popup-menu', self.on_right_click)

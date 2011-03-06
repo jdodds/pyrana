@@ -13,24 +13,13 @@ class PyGamePlayer(Plugin):
     messengers = set(['songstart', 'songpause', 'songend', 'songresume'])
     name = 'PyGamePlayer'
 
-    def run(self):
+    def pre_run(self):
         pygame.display.init()
         pygame.mixer.init()
         pygame.mixer.music.set_endevent(ENDEVENT)
         t = threading.Thread(target=self._songend_bubble, args=(self,))
         t.daemon = True
         t.start()
-
-        message_funcs = {
-            'songloaded': self.handle_songloaded,
-            'pause' : self.handle_pause,
-            'skipsong' : self.handle_skipsong,
-            'skipalbum' : self.handle_skipalbum,
-            'SHUTDOWN' : self.shutdown}
-        
-        while self.runnable:
-            message, payload = self.listener.get()
-            message_funcs[message](payload)
 
     def _songend_bubble(s,self):
         while self.runnable:
@@ -40,7 +29,7 @@ class PyGamePlayer(Plugin):
             else:
                 time.sleep(0.1)
                 
-    def handle_songloaded(self, payload):
+    def songloaded(self, payload):
         try:
             pygame.mixer.music.load(payload)
         except :
@@ -49,7 +38,7 @@ class PyGamePlayer(Plugin):
         self.playing = True
         self.send('songstart', payload)
 
-    def handle_pause(self, payload=None):
+    def pause(self, payload=None):
         if self.playing:
             pygame.mixer.music.pause()
             self.playing = False
@@ -59,10 +48,10 @@ class PyGamePlayer(Plugin):
             self.playing = True
             self.send('songresume')
 
-    def handle_skipsong(self, payload=None):
+    def skipsong(self, payload=None):
         pygame.mixer.music.stop()
 
-    def handle_skipalbum(self, payload=None):
+    def skipalbum(self, payload=None):
         pygame.mixer.music.stop()
             
     

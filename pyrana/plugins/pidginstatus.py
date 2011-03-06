@@ -6,18 +6,7 @@ class PidginStatus(Plugin):
     listeners = set(['songstart', 'songpause', 'songresume'])
     messengers = set()
 
-    def run(self):
-        message_funcs = {
-            'SHUTDOWN' : self.shutdown,
-            'songstart' : self.handle_songstart,
-            'songpause' : self.handle_pause,
-            'songresume' : self.handle_resume}
-
-        while self.runnable:
-            message, payload = self.listener.get()
-            message_funcs[message](payload)
-
-    def handle_songstart(self, payload):
+    def songstart(self, payload):
         #hacky.
         parts = payload.split('/')
         artist = parts[-3]
@@ -27,10 +16,10 @@ class PidginStatus(Plugin):
 
         self.update_status(self.song_msg)
 
-    def handle_pause(self, payload=None):
+    def pause(self, payload=None):
         self.update_status("Paused")
 
-    def handle_resume(self, payload=None):
+    def resume(self, payload=None):
         self.update_status(self.song_msg)
 
     def update_status(self, msg):

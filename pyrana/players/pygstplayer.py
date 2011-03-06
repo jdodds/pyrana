@@ -11,7 +11,7 @@ class PyGSTPlayer(Plugin):
     messengers = set(['songstart', 'songpause', 'songend', 'songresume'])
     name = 'PyGSTPlayer'
 
-    def run(self):
+    def pre_run(self):
         gobject.threads_init()
         self.player = gst.element_factory_make("playbin2", "player")
         fakesink = gst.element_factory_make('fakesink', 'fakesink')
@@ -20,33 +20,25 @@ class PyGSTPlayer(Plugin):
         self.player.set_property('video-sink', fakesink)
         self.playing = False
 
-        message_funcs = {
-            'songloaded' : self.handle_songloaded,
-            'pause' : self.handle_pause,
-            'skipsong' : self.stop,
-            'skipalbum' : self.stop,
-            'SHUTDOWN' : self.shutdown}
-
-        while self.runnable:
-            message, payload = self.listener.get()
-            message_funcs[message](payload)
-
     def on_eos(self, bus=None, msg=None):
         self.send('songend')
-
+    
     def stop(self, payload=None):
         self.player.set_state(gst.STATE_NULL)
         self.player.set_state(gst.STATE_READY)
         self.playing = False
+    skipsong = stop
+    skipalbum = stop
+    
 
-    def handle_songloaded(self, songpath):
+    def songloaded(self, songpath):
         self.stop()
         self.player.set_property('uri', 'file://%s' % songpath)
         self.player.set_state(gst.STATE_PLAYING)
         self.playing = True
         self.send('songstart', songpath)
 
-    def handle_pause(self, payload):
+    def pause(self, payload):
         if self.playing:
             self.player.set_state(gst.STATE_PAUSED)
             self.playing = False

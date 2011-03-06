@@ -40,20 +40,6 @@ class SaneRandomAlbums(Plugin):
             self.seen = {}
         self.current_album_hash = None
 
-    def run(self):
-        message_funcs = {
-            'play': self.next_album,
-            'skipsong': self.next_song,
-            'skipalbum': self.next_album,
-            'albumstart' : self.next_song,
-            'albumend' : self.next_album,
-            'songend' : self.next_song,
-            'SHUTDOWN' : self.shutdown}
-
-        while self.runnable:
-            message, payload = self.listener.get()
-            message_funcs[message](payload)
-
     def next_album(self, payload):
 
         while self.current_artist == self.last_artist:
@@ -80,6 +66,10 @@ class SaneRandomAlbums(Plugin):
              if os.path.splitext(song)[-1] in self.audio_types])
 
         self.send('albumstart', albumpath)
+    play = next_album
+    skipalbum = next_album
+    albumend = next_album
+    
 
     def next_song(self, payload):
         if len(self.current_album) == 0:
@@ -90,6 +80,9 @@ class SaneRandomAlbums(Plugin):
             self.current_album = self.current_album[1:]
             self.send('songloaded', song)
             
+    skipsong = next_song
+    albumstart = next_song
+    songend = next_song
         
             
     
