@@ -16,10 +16,10 @@ class PidginStatus(Plugin):
 
         self.update_status(self.song_msg)
 
-    def pause(self, payload=None):
+    def songpause(self, payload=None):
         self.update_status("Paused")
 
-    def resume(self, payload=None):
+    def songresume(self, payload=None):
         self.update_status(self.song_msg)
 
     def update_status(self, msg):
