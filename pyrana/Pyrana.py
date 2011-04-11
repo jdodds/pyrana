@@ -20,80 +20,48 @@ incredibly bloated.
 
 import os
 import random
+import shutil
 import ConfigParser
 
-import pynotify
-pynotify.init("Basics")
+from pkg_resources import resource_filename
 
+from feather import Application
+from pyrana.uis import GTK2
+from pyrana.players import PyGSTPlayer, PyGamePlayer, PygletPlayer
+from pyrana.playlists import SaneRandomAlbums
+from pyrana.plugins import Notify, PidginStatus
 
-
-class Pyrana(object):
-    def __init__(self):
-        from pkg_resources import resource_filename
-        self.__check_and_set_home_config()
-
-        self.config = ConfigParser.ConfigParser()
-        self.config.read(self.conf_file)
-
-        self.__init_seen()
-
-
-    def __check_and_set_home_config(self):
-        import os
-        from pkg_resources import resource_filename
-
-        home = os.path.expanduser('~')
-        conf_dir = os.path.join(home, '.pyrana')
-
-        if not os.path.isdir(conf_dir):
-            os.mkdir(conf_dir)
-
-        conf_file = os.path.join(conf_dir, 'pyrana.cfg')
-        if not os.path.isfile(conf_file):
-            base_conf = resource_filename('pyrana', 'resources/pyrana.cfg')
-
-            import shutil
-            shutil.copy(base_conf, conf_file)
-
-        self.conf_file = conf_file
-    def __init_seen(self):
-        import pickle
-        self.seen_file = os.path.expanduser(self.seen_file)
-        if os.path.exists(self.seen_file):
-            self.seen = pickle.load(open(self.seen_file, 'r'))
-        else:
-            self.seen = {}
-            
-    def __update_hash(self):
-        from md5 import md5
-        self.cur_hash = md5(self.cur_song).hexdigest()
-
-    def __update_seen(self):
-        import pickle
-        self.seen[self.cur_hash] = True
-        pickle.dump(self.seen, open(self.seen_file, 'w'))
-        
-    
-            
+Pyrana = Application(['play', 'pause', 'skipsong', 'skipalbum'])
 
 def main():
     """Entry point for Pyrana.py.
     Start rockin'
     """
 
-    from feather import Application
-    from pyrana.uis import GTK2
-    from pyrana.players import PyGSTPlayer, PyGamePlayer, PygletPlayer
-    from pyrana.playlists import SaneRandomAlbums
-    from pyrana.plugins import Notify, PidginStatus
+    home = os.path.expanduser('~')
+    confdir = os.path.join(home, '.config', 'pyrana')
 
-    pyrana = Application(['play', 'pause', 'skipsong', 'skipalbum'])
-    pyrana.register(GTK2())
-    pyrana.register(PyGSTPlayer())
-    pyrana.register(SaneRandomAlbums('~/music', '~/.pyrana/seen'))
-    pyrana.register(Notify())
-    pyrana.register(PidginStatus())
-    pyrana.start()
+    if not os.path.isdir(confdir):
+        os.mkdir(confdir)
+
+    conffile = os.path.join(confdir, 'options.ini')
+
+    if not os.path.isfile(conffile):
+        conftmpl = resource_filename('pyrana', 'resources/options.ini')
+        shutil.copy(conftmpl, conffile)
+
+    config = ConfigParser.ConfigParser()
+    config.read(conffile)
+
+    musicdir = os.path.expanduser(config.get('playlist', 'music_directory'))
+    seenfile = os.path.expanduser(config.get('playlist', 'seen_file'))
+
+    Pyrana.register(GTK2())
+    Pyrana.register(PyGSTPlayer())
+    Pyrana.register(SaneRandomAlbums(musicdir, seenfile))
+    Pyrana.register(Notify())
+    Pyrana.register(PidginStatus())
+    Pyrana.start()
 
 
 if __name__ == '__main__':
