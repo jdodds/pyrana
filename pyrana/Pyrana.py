@@ -108,7 +108,7 @@ class Pyrana(object):
         bus = self.player.get_bus()
         bus.add_signal_watch()
         bus.enable_sync_message_emission()
-        bus.connect('message::eos', self.on_eos)
+        bus.connect('message', self.on_message)
 
         self.playing = False
         self.cur_song = None
@@ -118,11 +118,14 @@ class Pyrana(object):
 
         gtk.main()
 
-    def on_eos(self, bus, msg):
-        self.player.set_state(gst.STATE_NULL)
-        self.cur_song = None
-        self.playing = False
-        self.on_left_click(None)
+    def on_message(self, bus, msg):
+        if msg.type == gst.MESSAGE_EOS:
+            self.player.set_state(gst.STATE_NULL)
+            self.cur_song = None
+            self.playing = False
+            self.on_left_click(None)
+        elif msg.type == gst.MESSAGE_ERROR:
+            raise Exception(msg)
 
     def on_left_click(self, widget, data=None):
         """Click handler for our status icon. Play or stop playing,
