@@ -83,6 +83,7 @@ class Pyrana(object):
         self.pidgin_status = self.config.get('main', 'update_pidgin_status')
         self.use_notify = self.config.get('main', 'use_notify')
         self.seen_file = self.config.get('main', 'seen_file')
+        self.music_dir = self.config.get('main', 'music_dir')
 
         self.__init_seen()
 
@@ -93,7 +94,7 @@ class Pyrana(object):
         bus.enable_sync_message_emission()
         bus.connect('message', self.on_message)
 
-        self.artists = build_index(self.config.get('main', 'music_dir'))
+        self.artists = build_index(self.music_dir)
         self.playing = False
         self.cur_song = None
         self.cur_album = None
