@@ -241,6 +241,7 @@ class Pyrana(object):
             shutil.copy(base_conf, conf_file)
 
         self.conf_file = conf_file
+
     def __init_seen(self):
         import pickle
         self.seen_file = os.path.expanduser(self.seen_file)
