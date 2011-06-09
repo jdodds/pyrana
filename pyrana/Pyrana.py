@@ -35,6 +35,32 @@ import gst
 
 from pyrana.gui import PyranaGUI
 
+
+def build_index(path):
+    """ Generate a list of sets of albums by artists.
+
+    Assume the directory structure...
+
+    Artists
+    |-> Albums
+      |-> Songs
+
+    This is a little ugly, but whatever.
+
+    """
+    root = os.path.expanduser(path)
+    artists = [[os.path.join(artist, album)
+                         for album in os.listdir(artist)
+                         if os.path.isdir(os.path.join(artist, album))]
+                    for artist in
+                    [os.path.join(root, artistname)
+                     for artistname in os.listdir(root)
+                     if os.path.isdir(os.path.join(root, artistname))]]
+
+    # just in case we get some empty directories
+    return [a for a in artists if a]
+
+
 class Pyrana(object):
 
     """ Our player, sending sweet, sweet sounds to our speakers.  """
@@ -54,30 +80,11 @@ class Pyrana(object):
         self.config = ConfigParser.ConfigParser()
         self.config.read(self.conf_file)
 
-        self.pidgin_status = self.config.get('main',
-                                             'update_pidgin_status')
+        self.pidgin_status = self.config.get('main', 'update_pidgin_status')
         self.use_notify = self.config.get('main', 'use_notify')
         self.seen_file = self.config.get('main', 'seen_file')
+
         self.__init_seen()
-
-        #give us a list of sets of albums by artists, assuming the directory
-        #structure
-        #Artists
-        # Albums
-        #  Songs
-        #This is a little ugly, but whatever.
-        root = os.path.expanduser(
-            self.config.get('main', 'music_dir'))
-        self.artists = [[os.path.join(artist, album)
-                             for album in os.listdir(artist)
-                             if os.path.isdir(os.path.join(artist, album))]
-                        for artist in
-                        [os.path.join(root, artistname)
-                         for artistname in os.listdir(root)
-                         if os.path.isdir(os.path.join(root, artistname))]]
-
-        #just in case we get some empty directories
-        self.artists = [a for a in self.artists if a]
 
         self.player = gst.element_factory_make("playbin2", "player")
 
@@ -86,6 +93,7 @@ class Pyrana(object):
         bus.enable_sync_message_emission()
         bus.connect('message', self.on_message)
 
+        self.artists = build_index(self.config.get('main', 'music_dir'))
         self.playing = False
         self.cur_song = None
         self.cur_album = None
