@@ -248,7 +248,7 @@ class Pyrana(object):
             self.seen = pickle.load(open(self.seen_file, 'r'))
         else:
             self.seen = {}
-            
+
     def __update_hash(self):
         from md5 import md5
         self.cur_hash = md5(self.cur_song).hexdigest()
@@ -257,15 +257,14 @@ class Pyrana(object):
         import pickle
         self.seen[self.cur_hash] = True
         pickle.dump(self.seen, open(self.seen_file, 'w'))
-        
-    
-            
+
 
 def main():
     """Entry point for Pyrana.py.
     Start rockin'
     """
     Pyrana()
+
 
 if __name__ == '__main__':
     main()
