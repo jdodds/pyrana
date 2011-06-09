@@ -18,19 +18,26 @@ incredibly bloated.
 """
 
 
+from hashlib import md5
+from pkg_resources import resource_filename
+
+import ConfigParser
 import os
 import random
-import ConfigParser
+import pickle
+import shutil
+
+import dbus
 
 import pygst
-pygst.require("0.10")
+pygst.require("0.10") # pygst requires us to call this before importing gst
 import gst
 
 import pygtk
-pygtk.require('2.0')
 import gtk
-
 import pynotify
+
+pygtk.require("2.0")
 pynotify.init("Basics")
 
 
@@ -48,8 +55,6 @@ class Pyrana(object):
         """Initialize our player with a root directory to search through for
         music, and start the gtk main thread.
         """
-        from pkg_resources import resource_filename
-
         self.__check_and_set_home_config()
 
         self.status_icon = gtk.StatusIcon()
@@ -134,7 +139,6 @@ class Pyrana(object):
         """Click handler for our status icon. Play or stop playing,
         respectively.
         """
-        from pkg_resources import resource_filename
         if not self.playing:
             self.playing = True
             self.status_icon.set_from_file(
@@ -171,13 +175,14 @@ class Pyrana(object):
         self.menu.popup(None, None, None, event_button, event_time)
 
     def get_next_song(self):
-        import os.path
         if not self.cur_album:
             artist = self.cur_artist
 
             while artist == self.cur_artist:
+                print self.artists
                 artist = random.choice(self.artists)
 
+            print artist
             albumpath = artist.pop(random.randrange(len(artist)))
             self.cur_album = sorted(
                 [os.path.join(albumpath, song)
@@ -206,7 +211,6 @@ class Pyrana(object):
         notification.show()
 
     def update_pidgin_status(self, songpath=None):
-        import dbus
         bus = dbus.SessionBus()
 
         if songpath:
@@ -230,9 +234,6 @@ class Pyrana(object):
             purple.PurpleSavedstatusActivate(status)
 
     def __check_and_set_home_config(self):
-        import os
-        from pkg_resources import resource_filename
-
         home = os.path.expanduser('~')
         conf_dir = os.path.join(home, '.pyrana')
 
@@ -243,13 +244,11 @@ class Pyrana(object):
         if not os.path.isfile(conf_file):
             base_conf = resource_filename('pyrana', 'resources/pyrana.cfg')
 
-            import shutil
             shutil.copy(base_conf, conf_file)
 
         self.conf_file = conf_file
 
     def __init_seen(self):
-        import pickle
         self.seen_file = os.path.expanduser(self.seen_file)
         if os.path.exists(self.seen_file):
             self.seen = pickle.load(open(self.seen_file, 'r'))
@@ -257,11 +256,9 @@ class Pyrana(object):
             self.seen = {}
 
     def __update_hash(self):
-        from hashlib import md5
         self.cur_hash = md5(self.cur_song).hexdigest()
 
     def __update_seen(self):
-        import pickle
         self.seen[self.cur_hash] = True
         pickle.dump(self.seen, open(self.seen_file, 'w'))
 
