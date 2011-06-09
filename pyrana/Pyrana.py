@@ -257,7 +257,7 @@ class Pyrana(object):
             self.seen = {}
 
     def __update_hash(self):
-        from md5 import md5
+        from hashlib import md5
         self.cur_hash = md5(self.cur_song).hexdigest()
 
     def __update_seen(self):
