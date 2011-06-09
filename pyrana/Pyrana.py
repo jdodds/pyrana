@@ -120,12 +120,15 @@ class Pyrana(object):
 
     def on_message(self, bus, msg):
         if msg.type == gst.MESSAGE_EOS:
-            self.player.set_state(gst.STATE_NULL)
-            self.cur_song = None
-            self.playing = False
-            self.on_left_click(None)
+            self.end_of_song()
         elif msg.type == gst.MESSAGE_ERROR:
             raise Exception(msg)
+
+    def end_of_song(self):
+        self.player.set_state(gst.STATE_NULL)
+        self.cur_song = None
+        self.playing = False
+        self.on_left_click(None)
 
     def on_left_click(self, widget, data=None):
         """Click handler for our status icon. Play or stop playing,
@@ -186,11 +189,11 @@ class Pyrana(object):
         return song
 
     def skip_song(self, data=None):
-        self.on_eos(None, None)
+        self.end_of_song()
 
     def skip_album(self, data=None):
         self.cur_album = None
-        self.on_eos(None, None)
+        self.end_of_song()
 
     def quit(widget, data=None):
         gtk.main_quit()
