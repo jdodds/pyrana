@@ -194,7 +194,7 @@ class Pyrana(object):
         pickle.dump(self.seen, open(self.seen_file, 'w'))
 
 
-def _check_and_set_home_config(self):
+def _check_and_set_home_config():
     """ Create from skel if necessary """
 
     home = os.path.expanduser('~')
