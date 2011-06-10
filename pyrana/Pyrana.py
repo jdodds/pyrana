@@ -136,11 +136,9 @@ class Pyrana(object):
         if not self.cur_album:
             artist = self.cur_artist
 
-            while artist == self.cur_artist:
-                print self.artists
+            while artist == self.cur_artist or not artist:
                 artist = random.choice(self.artists)
 
-            print artist
             albumpath = artist.pop(random.randrange(len(artist)))
             self.cur_album = sorted(
                 [os.path.join(albumpath, song)
