@@ -1,22 +1,21 @@
 #!/usr/bin/env python
-"""
-Pyrana -- a minimalist music player.
+""" Pyrana -- a minimalist music player.
 
 This program was written out of frustration with larger music players. Pretty
 much all I've ever wanted out of a music player was one that played random
 albums by picking a random artist, then picking a random album, then playing
 that album, then picking another random artist.
 
-For some reason,I've never run into a music player that played random albums
-that way, which led to me often ending up having to skip past multiple albums by
-a particular artist, especially when the artist has a large discography.
+For some reason, I've never run into a music player that played random albums
+that way, which led to me often ending up having to skip past multiple albums
+by a particular artist, especially when the artist has a large discography.
 
 While I call this player minimalist, that's not set in stone -- I'll probably
 add last.fm scrobbling capability and other various features. These features
 will, however, be ones that I find useful. I highly doubt this app will ever be
 incredibly bloated.
-"""
 
+"""
 
 from pkg_resources import resource_filename
 from hashlib import md5
@@ -68,32 +67,30 @@ class Pyrana(object):
         '.ogg'
     ]
 
-    def __init__(self):
-        """Initialize our player with a root directory to search through for
-        music, and start the gtk main thread.
-        """
-        self.__check_and_set_home_config()
+    def __init__(self, pidgin_status, use_notify, seen_file, music_dir):
+        """ Wire up dependencies and defaults. """
 
-        self.config = ConfigParser.ConfigParser()
-        self.config.read(self.conf_file)
+        self.seen_file = seen_file
+        self.pidgin_status = pidgin_status
+        self.use_notify = use_notify
 
-        self.pidgin_status = self.config.get('main', 'update_pidgin_status')
-        self.use_notify = self.config.get('main', 'use_notify')
-        self.seen_file = self.config.get('main', 'seen_file')
-        self.music_dir = self.config.get('main', 'music_dir')
+        self.artists = build_index(music_dir)
 
-        self.__init_seen()
-
-        self.player = PyranaPlayer(self)
-
-        self.artists = build_index(self.music_dir)
         self.playing = False
         self.cur_song = None
         self.cur_album = None
         self.cur_artist = None
         self.cur_hash = None
 
+        self.__init_seen()
+
+        self.player = PyranaPlayer(self)
         self.gui = PyranaGUI(self)
+
+    def start(self):
+        """ Start the main GTK and gstreamer threads. """
+
+        self.player.start()
         self.gui.start()
 
     def end_of_song(self):
@@ -182,21 +179,6 @@ class Pyrana(object):
 
             purple.PurpleSavedstatusActivate(status)
 
-    def __check_and_set_home_config(self):
-        home = os.path.expanduser('~')
-        conf_dir = os.path.join(home, '.pyrana')
-
-        if not os.path.isdir(conf_dir):
-            os.mkdir(conf_dir)
-
-        conf_file = os.path.join(conf_dir, 'pyrana.cfg')
-        if not os.path.isfile(conf_file):
-            base_conf = resource_filename('pyrana', 'resources/pyrana.cfg')
-
-            shutil.copy(base_conf, conf_file)
-
-        self.conf_file = conf_file
-
     def __init_seen(self):
         self.seen_file = os.path.expanduser(self.seen_file)
         if os.path.exists(self.seen_file):
@@ -212,11 +194,43 @@ class Pyrana(object):
         pickle.dump(self.seen, open(self.seen_file, 'w'))
 
 
+def _check_and_set_home_config(self):
+    """ Create from skel if necessary """
+
+    home = os.path.expanduser('~')
+    conf_dir = os.path.join(home, '.pyrana')
+
+    if not os.path.isdir(conf_dir):
+        os.mkdir(conf_dir)
+
+    conf_file = os.path.join(conf_dir, 'pyrana.cfg')
+    if not os.path.isfile(conf_file):
+        base_conf = resource_filename('pyrana', 'resources/pyrana.cfg')
+
+        shutil.copy(base_conf, conf_file)
+
+    return conf_file
+
+
 def main():
-    """Entry point for Pyrana.py.
+    """ Entry point for Pyrana.py.
+
     Start rockin'
+
     """
-    Pyrana()
+    conf_file = _check_and_set_home_config()
+
+    config = ConfigParser.ConfigParser()
+    config.read(conf_file)
+
+    pidgin_status = config.get('main', 'update_pidgin_status')
+    use_notify = config.get('main', 'use_notify')
+    seen_file = config.get('main', 'seen_file')
+    music_dir = config.get('main', 'music_dir')
+
+    pyrana = Pyrana(pidgin_status, use_notify, seen_file, music_dir)
+
+    pyrana.start()
 
 
 if __name__ == '__main__':

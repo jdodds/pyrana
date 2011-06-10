@@ -9,6 +9,8 @@ class PyranaPlayer(object):
 
     def __init__(self, helper):
         self.helper = helper
+
+    def start(self):
         self.player = gst.element_factory_make("playbin2", "player")
 
         bus = self.player.get_bus()
