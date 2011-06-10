@@ -29,11 +29,8 @@ import shutil
 
 import dbus
 
-import pygst
-pygst.require("0.10") # pygst requires us to call this before importing gst
-import gst
-
 from pyrana.gui import PyranaGUI
+from pyrana.player import PyranaPlayer
 
 
 def build_index(path):
@@ -87,12 +84,7 @@ class Pyrana(object):
 
         self.__init_seen()
 
-        self.player = gst.element_factory_make("playbin2", "player")
-
-        bus = self.player.get_bus()
-        bus.add_signal_watch()
-        bus.enable_sync_message_emission()
-        bus.connect('message', self.on_message)
+        self.player = PyranaPlayer(self)
 
         self.artists = build_index(self.music_dir)
         self.playing = False
@@ -104,14 +96,8 @@ class Pyrana(object):
         self.gui = PyranaGUI(self)
         self.gui.start()
 
-    def on_message(self, bus, msg):
-        if msg.type == gst.MESSAGE_EOS:
-            self.end_of_song()
-        elif msg.type == gst.MESSAGE_ERROR:
-            raise Exception(msg)
-
     def end_of_song(self):
-        self.player.set_state(gst.STATE_NULL)
+        self.player.stop()
         self.cur_song = None
         self.playing = False
         self.on_left_click(None)
@@ -129,9 +115,10 @@ class Pyrana(object):
                 while self.seen.get(self.cur_hash):
                     self.cur_song = self.get_next_song()
                     self.__update_hash()
-                self.player.set_property('uri', 'file://%s' % self.cur_song)
+
+                self.player.song = self.cur_song
                 self.__update_seen()
-            self.player.set_state(gst.STATE_PLAYING)
+            self.player.play()
             if self.use_notify:
                 self.gui.notify(self.cur_song)
             self.gui.play(self.cur_song)
@@ -140,7 +127,7 @@ class Pyrana(object):
 
 
         else:
-            self.player.set_state(gst.STATE_PAUSED)
+            self.player.pause()
             self.playing = False
             self.gui.pause(self.cur_song)
             if self.pidgin_status:
