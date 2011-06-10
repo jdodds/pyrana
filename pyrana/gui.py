@@ -10,7 +10,9 @@ pynotify.init("Basics")
 
 class PyranaGUI(object):
 
-    def __init__(self, helper):
+    def __init__(self, helper, use_notify):
+        self.use_notify = use_notify
+
         self.status_icon = gtk.StatusIcon()
         self.status_icon.set_visible(True)
         self.status_icon.set_tooltip("Pyrana!")
@@ -46,14 +48,19 @@ class PyranaGUI(object):
         self.status_icon.set_tooltip("[PAUSED] %s" % song)
 
     def play(self, song):
+        self._notify(song)
+
         self.status_icon.set_from_file(
             resource_filename('pyrana', 'resources/playing.png')
         )
         self.status_icon.set_tooltip(song)
 
-    def notify(self, songpath):
+    def _notify(self, songpath):
         """Use libnotify to show growl-like alerts about what's playing.
         """
+        if not self.use_notify:
+            return False
+
         to_display = "Playing: %s" % songpath
         notification = pynotify.Notification("Pyrana", to_display)
         notification.show()

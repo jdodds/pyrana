@@ -72,7 +72,6 @@ class Pyrana(object):
 
         self.seen_file = seen_file
         self.pidgin_status = pidgin_status
-        self.use_notify = use_notify
 
         self.artists = build_index(music_dir)
 
@@ -85,7 +84,7 @@ class Pyrana(object):
         self.__init_seen()
 
         self.player = PyranaPlayer(self)
-        self.gui = PyranaGUI(self)
+        self.gui = PyranaGUI(self, use_notify)
 
     def start(self):
         """ Start the main GTK and gstreamer threads. """
@@ -100,35 +99,38 @@ class Pyrana(object):
         self.on_left_click(None)
 
     def on_left_click(self, widget, data=None):
-        """Click handler for our status icon. Play or stop playing,
-        respectively.
-        """
+        """ Toggle play status. """
+
         if not self.playing:
-            self.playing = True
             if not self.cur_song:
-                self.cur_song = self.get_next_song()
-                self.__update_hash()
-
-                while self.seen.get(self.cur_hash):
-                    self.cur_song = self.get_next_song()
-                    self.__update_hash()
-
-                self.player.song = self.cur_song
-                self.__update_seen()
-            self.player.play()
-            if self.use_notify:
-                self.gui.notify(self.cur_song)
-            self.gui.play(self.cur_song)
-            if self.pidgin_status:
-                self.update_pidgin_status(self.cur_song)
-
-
+                # don't change songs if we're paused
+                self.get_next_unseen_song()
+            self.start_playing()
         else:
-            self.player.pause()
-            self.playing = False
-            self.gui.pause(self.cur_song)
-            if self.pidgin_status:
-                self.update_pidgin_status()
+            self.stop_playing()
+
+    def start_playing(self):
+        self.player.play()
+        self.playing = True
+        self.gui.play(self.cur_song)
+        self.update_pidgin_status(self.cur_song)
+
+    def stop_playing(self):
+        self.player.pause()
+        self.playing = False
+        self.gui.pause(self.cur_song)
+        self.update_pidgin_status()
+
+    def get_next_unseen_song(self):
+        self.cur_song = self.get_next_song()
+        self.__update_hash()
+
+        while self.seen.get(self.cur_hash):
+            self.cur_song = self.get_next_song()
+            self.__update_hash()
+
+        self.player.song = self.cur_song
+        self.__update_seen()
 
     def get_next_song(self):
         if not self.cur_album:
@@ -157,6 +159,9 @@ class Pyrana(object):
         self.end_of_song()
 
     def update_pidgin_status(self, songpath=None):
+        if not self.pidgin_status:
+            return False
+
         bus = dbus.SessionBus()
 
         if songpath:
