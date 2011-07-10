@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="Pyrana",
-    version="1.0.2",
+    version="2.0.0",
     packages=find_packages(),
     include_package_data=True,
     exclude_package_data={'': ['.gitignore']},
@@ -17,7 +17,7 @@ setup(
     },
     scripts = ['pyrana/Pyrana.py'],
     setup_requires = ['setuptools_git >= 0.3'],
-    install_requires = ['nose >= 1.0.0', 'feather >=0.1dev'],
+    install_requires = ['nose >= 1.0.0', 'feather >=0.9.0'],
     zip_safe = False,
     author = "Jeremiah Dodds",
     author_email = "jeremiah.dodds@gmail.com",
