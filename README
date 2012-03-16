@@ -21,45 +21,44 @@ incredibly bloated.
 REQUIREMENTS
 ------------
 
-Pyrana WILL NOT WORK if you do not install what is outlined below.
+Pyrana, by default, requires PyGTK (http://www.pygtk.org/downloads.html), and
+gst-python >= 0.10.0, which is likely available from your package manager --
+it's the python2 bindings to gstreamer. gst-python isn't available via your
+system's tools, get it from http://gstreamer.freedesktop.org/src/gst-python/ .
 
-You'll need PyGTK, available from http://www.pygtk.org/downloads.html . (last
-version I teseted on was 2.22 ) Its setup.py throws a big old warning if you try
-to install it via setuputils, and I've never actually had it successfully
-install that way. On the plus side, your package manager probably provides a
-package, if it's not already on your system.
+Pyrana is written using a framework called feather
+(https://github.com/jdodds/feather). The above dependencies can be removed
+pretty easily if you don't want to use GTK or gstreamer, provided you write
+something for displaying the UI and something for playing audio files. Take a
+look at the source if you're interested.
 
-You'll also need to install python-notify >= 1.1, available from
-http://www.galago-project.org/files/releases/source/notify-python/ . I'll
-probably try to move away from this dependency in the near future.
+Pyrana assumes that your music directory is arranged in a artist/album
+heirarchy.Something like:
 
-ALSO, you'll need to install gst-python >= 0.10.0, available from
-http://gstreamer.freedesktop.org/src/gst-python/ . This is another dependency
-I'll be most likely removing at some point...
-
-Your music directory has to be arranged in a artist/album heirarchy. Something like:
-
-music/
-  Underpowered Umpires/
-    Third Strike/
-  Robby and the Revoltors/
-    William S. Burroughs Was My Father/
+    music/
+      Underpowered Umpires/
+        Third Strike/
+      Robby and the Revoltors/
+        William S. Burroughs Was My Father/
 
 CONFIGURING
 -----------
 
-Pyrana stores its configuration in ~/.pyrana/pyrana.cfg. It currently accepts 3
-options:
+Pyrana stores its configuration in ~/.config/pyrana/options.ini. The file looks
+like this by default:
 
-use_notify :: whether or not to use libnotify to pop up little messages about
-what's playing, defaults to True
+    [main]
+    use_notify: true
+    update_pidgin_status: true
+    
+    [playlist]
+    music_directory: ~/music
+    seen_file: ~/.config/pyrana/seen
 
-music_dir :: where your music is located, defaults to ~/music
-
-seen_file :: where to store the file containing hashes of seen songs
-
-update_pidgin_status :: whether you want Pyrana to update your pidgin status for
-you when a track updates, defaults to True
+The options under `[main]` aren't actually used at the moment, sorry. I'm still
+catching up a bit from a major rewrite. `music_directory` should be
+self-explanatory. `seen_file` is used by pyrana to ensure that albums that have
+been played already aren't played again, you should be able to just ignore it.
 
 CREDIT
 ------
