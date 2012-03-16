@@ -1,6 +1,3 @@
-import pynotify
-pynotify.init("Basics")
-
 from feather import Plugin
 
 class Notify(Plugin):
@@ -9,6 +6,5 @@ class Notify(Plugin):
 
     def songloaded(self, payload):
         msg = "Playing: %s" % payload
-        notification = pynotify.Notification("Pyrana", msg)
-        notification.show()
+        print(msg)
 

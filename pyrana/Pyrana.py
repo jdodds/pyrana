@@ -30,33 +30,10 @@ from pkg_resources import resource_filename
 
 from feather import Application
 from pyrana.uis import GTK2
-from pyrana.players import PyGSTPlayer, PyGamePlayer, PygletPlayer
+from pyrana.players import PyGSTPlayer
 from pyrana.playlists import SaneRandomAlbums
-from pyrana.plugins import Notify, PidginStatus
-
-Pyrana = Application(['play', 'pause', 'skipsong', 'skipalbum'])
 
 def main():
-    """Entry point for Pyrana.py.
-    Start rockin'
-    """
-    root = os.path.expanduser(path)
-    artists = [[os.path.join(artist, album)
-                         for album in os.listdir(artist)
-                         if os.path.isdir(os.path.join(artist, album))]
-                    for artist in
-                    [os.path.join(root, artistname)
-                     for artistname in os.listdir(root)
-                     if os.path.isdir(os.path.join(root, artistname))]]
-
-    # just in case we get some empty directories
-    return [a for a in artists if a]
-
-
-class Pyrana(object):
-
-    """ Our player, sending sweet, sweet sounds to our speakers.  """
-
     home = os.path.expanduser('~')
     confdir = os.path.join(home, '.config', 'pyrana')
 
@@ -75,13 +52,11 @@ class Pyrana(object):
     musicdir = os.path.expanduser(config.get('playlist', 'music_directory'))
     seenfile = os.path.expanduser(config.get('playlist', 'seen_file'))
 
+    Pyrana = Application(['play', 'pause', 'skipsong', 'skipalbum'])
     Pyrana.register(GTK2())
     Pyrana.register(PyGSTPlayer())
     Pyrana.register(SaneRandomAlbums(musicdir, seenfile))
-    Pyrana.register(Notify())
-    Pyrana.register(PidginStatus())
     Pyrana.start()
-
 
 if __name__ == '__main__':
     main()
