@@ -10,7 +10,9 @@ class GTK2(Plugin):
     """A simplistic interface of nothing but a tray icon"""
 
     listeners = set(['APP_START'])
-    messengers = set(['APP_STOP', 'play', 'pause', 'skipsong', 'skipalbum'])
+    messengers = set([
+            'APP_STOP', 'play', 'pause', 'skipsong', 'skipalbum', 'show_playing'
+    ])
     name = 'GTK2'
 
     playing_icon = resource_filename('pyrana', 'resources/playing.png')
@@ -53,20 +55,24 @@ class GTK2(Plugin):
         self.menu = gtk.Menu()
         skip_song = gtk.MenuItem("Skip Song")
         play = gtk.MenuItem("Play/Pause")
+        show_playing = gtk.MenuItem("Show What's Playing")
         skip_album = gtk.MenuItem("Skip Album")
         quit_app = gtk.MenuItem("Quit")
 
         self.menu.append(play)
+        self.menu.append(show_playing)
         self.menu.append(skip_song)
         self.menu.append(skip_album)
         self.menu.append(quit_app)
 
         play.connect_object('activate', self.on_left_click, 'Play/Pause')
+        show_playing.connect_object('activate', self.show_playing, "Show What's Playing")
         skip_song.connect_object("activate", self.skip_song, "Skip Song")
         skip_album.connect_object("activate", self.skip_album, "Skip Album")
         quit_app.connect_object("activate", self.quit, "Quit")
 
         play.show()
+        show_playing.show()
         skip_song.show()
         skip_album.show()
         quit_app.show()
@@ -76,7 +82,10 @@ class GTK2(Plugin):
 
     def skip_album(self, *args):
         self.send('skipalbum')
-        
+
+    def show_playing(self, *args):
+        self.send('show_playing')
+
     def on_right_click(self, data, event_button, event_time):
         self.menu.popup(None, None, None, event_button, event_time)
 
@@ -97,8 +106,3 @@ class GTK2(Plugin):
             else:
                 self.first_played = True
                 self.send('play')
-
-
-
-    
-    
