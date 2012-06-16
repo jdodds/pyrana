@@ -32,6 +32,7 @@ from feather import Application
 from pyrana.uis import GTK2
 from pyrana.players import PyGSTPlayer
 from pyrana.playlists import SaneRandomAlbums
+from pyrana.plugins import Notify
 
 def main():
     home = os.path.expanduser('~')
@@ -56,6 +57,7 @@ def main():
     Pyrana.register(GTK2())
     Pyrana.register(PyGSTPlayer())
     Pyrana.register(SaneRandomAlbums(musicdir, seenfile))
+    Pyrana.register(Notify())
     Pyrana.start()
 
 if __name__ == '__main__':
