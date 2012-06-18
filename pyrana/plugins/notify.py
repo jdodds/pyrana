@@ -10,10 +10,16 @@ class Notify(Plugin):
 
     def songloaded(self, payload):
         self.currently_playing = payload
-        smart_notify.notify('playing', payload, 'Pyrana')
+        self._notify()
 
     def songresume(self, payload):
-        smart_notify.notify('playing', self.currently_playing, 'Pyrana')
+        self._notify()
 
     def show_playing(self, payload):
         self.songresume(payload)
+
+    def _notify(self):
+        try:
+            smart_notify.notify('playing', self.currently_playing, 'Pyrana')
+        except:
+            pass
