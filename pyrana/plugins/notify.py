@@ -9,7 +9,7 @@ class Notify(Plugin):
         self.currently_playing = 'Nothing'
 
     def songloaded(self, payload):
-        self.currently_playing = payload
+        self.currently_playing = unicode(payload, errors='ignore')
         self._notify()
 
     def songresume(self, payload):
