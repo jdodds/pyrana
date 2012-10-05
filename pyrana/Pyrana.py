@@ -32,7 +32,7 @@ from feather import Application
 from pyrana.uis import GTK2
 from pyrana.players import PyGSTPlayer
 from pyrana.playlists import SaneRandomAlbums
-from pyrana.plugins import Notify
+from pyrana.plugins import Notify, LastFmScrobbler, MetadataReader
 
 def main():
     home = os.path.expanduser('~')
@@ -58,6 +58,13 @@ def main():
     Pyrana.register(PyGSTPlayer())
     Pyrana.register(SaneRandomAlbums(musicdir, seenfile))
     Pyrana.register(Notify())
+    Pyrana.register(MetadataReader())
+    Pyrana.register(LastFmScrobbler(
+        config.get('lastfm', 'username'),
+        config.get('lastfm', 'password')
+    ))
+
+
     Pyrana.start()
 
 if __name__ == '__main__':
