@@ -31,9 +31,14 @@ class LastFmScrobbler(Plugin):
         self.metadata = payload
 
     def songend(self, payload=None):
-        self.network.scrobble(
-            self.metadata['artist'][0],
-            self.metadata['title'][0],
-            self.started_at,
-            self.metadata['album'][0]
-        )
+        try:
+            self.network.scrobble(
+                self.metadata['artist'][0],
+                self.metadata['title'][0],
+                self.started_at,
+                self.metadata['album'][0]
+            )
+        except KeyError:
+            pass
+        except WSError: # this seems to mean that last.fm is temporarily unavailable
+            pass
